@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import Button from '../atoms/Button';
 import Icon from '../atoms/Icon';
 import IconButton from '../atoms/IconButton';
@@ -46,9 +47,51 @@ export default function Topbar({
   onManageLabels,
 }: TopbarProps) {
   const t = useT();
+  const [mobileSearchOpen, setMobileSearchOpen] = useState(false);
+
+  if (mobileSearchOpen) {
+    return (
+      <header className="flex h-14 shrink-0 items-center gap-2 border-b border-paper-300 bg-paper-50 px-3 shadow-xs sm:hidden">
+        <Icon name="search" className="size-4 shrink-0 text-ink-400" />
+        <input
+          type="search"
+          autoFocus
+          value={query}
+          placeholder={t('board.searchCards')}
+          aria-label={t('board.searchCards')}
+          onChange={(event) => onQueryChange(event.target.value)}
+          onKeyDown={(event) => {
+            if (event.key === 'Escape') {
+              onQueryChange('');
+              setMobileSearchOpen(false);
+            }
+          }}
+          className="min-w-0 flex-1 bg-transparent text-base text-ink-900 placeholder:text-ink-400 focus:outline-none"
+        />
+        {query !== '' && (
+          <button
+            type="button"
+            onClick={() => onQueryChange('')}
+            aria-label={t('common.cancel')}
+            className="flex size-8 items-center justify-center rounded-md text-ink-400 hover:text-ink-800"
+          >
+            <Icon name="close" className="size-4" />
+          </button>
+        )}
+        <IconButton
+          icon="close"
+          label={t('common.cancel')}
+          onClick={() => {
+            onQueryChange('');
+            setMobileSearchOpen(false);
+          }}
+        />
+      </header>
+    );
+  }
 
   return (
-    <header className="flex h-14 shrink-0 items-center gap-1 border-b border-paper-300 bg-paper-50 px-1.5 sm:gap-2 sm:px-4">
+    <header className="flex h-14 shrink-0 items-center gap-1.5 border-b border-paper-300 bg-paper-50 px-2 shadow-xs sm:gap-3 sm:px-4">
       <IconButton
         icon="grip"
         label={t('nav.openMenu')}
@@ -72,7 +115,7 @@ export default function Topbar({
         />
       )}
 
-      <span className="hidden items-center rounded-md bg-paper-100 px-2 py-1 text-[11px] font-medium text-ink-400 tabular-nums xl:inline-flex">
+      <span className="hidden items-center rounded-full bg-paper-200/90 px-2.5 py-0.5 text-[11px] font-semibold text-ink-600 tabular-nums xl:inline-flex">
         {t('board.cardCount', { count: cardCount })}
       </span>
 
@@ -80,6 +123,14 @@ export default function Topbar({
         <div className="hidden w-56 sm:block lg:w-64">
           <SearchField value={query} onChange={onQueryChange} />
         </div>
+
+        <IconButton
+          icon="search"
+          label={t('board.searchCards')}
+          onClick={() => setMobileSearchOpen(true)}
+          className="sm:hidden"
+        />
+
         <span className="hidden lg:block">
           <ThemeToggle preference={theme} onChange={onThemeChange} />
         </span>
@@ -105,6 +156,7 @@ export default function Topbar({
           onClick={onNewBoard}
           className="xl:hidden"
         />
+
         <span className="hidden md:block">
           <AccountMenu
             user={user}

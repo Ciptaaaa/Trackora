@@ -20,7 +20,7 @@ export default function TextArea({
       <label
         htmlFor={fieldId}
         className={
-          hideLabel ? 'sr-only' : 'mb-1.5 block text-xs font-medium text-ink-600'
+          hideLabel ? 'sr-only' : 'mb-1.5 block text-xs font-semibold text-ink-700'
         }
       >
         {label}
@@ -28,7 +28,7 @@ export default function TextArea({
       <textarea
         id={fieldId}
         rows={rows}
-        className={`w-full resize-y rounded-lg bg-paper-50 px-3 py-2 text-sm leading-relaxed text-ink-900 ring-1 ring-paper-300 ring-inset transition placeholder:text-ink-400 hover:ring-paper-400 focus:bg-paper-50 focus:ring-petrol-400 dark:ring-paper-400 ${className}`}
+        className={`w-full resize-y rounded-lg border border-paper-300 bg-paper-50 px-3 py-2 text-base sm:text-sm leading-relaxed text-ink-900 shadow-2xs transition-all placeholder:text-ink-400 hover:border-paper-400 focus:border-petrol-500 focus:ring-2 focus:ring-petrol-500/20 focus:outline-none dark:border-paper-400 ${className}`}
         {...rest}
       />
     </div>

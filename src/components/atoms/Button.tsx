@@ -11,18 +11,18 @@ interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
 
 const VARIANTS: Record<ButtonVariant, string> = {
   primary:
-    'bg-petrol-600 text-onaccent shadow-sm shadow-petrol-600/20 hover:bg-petrol-700 active:bg-petrol-700',
+    'bg-petrol-600 text-white shadow-xs hover:bg-petrol-700 active:scale-[0.98] focus-visible:ring-2 focus-visible:ring-petrol-500 focus-visible:ring-offset-2',
   secondary:
-    'bg-petrol-50 text-petrol-700 ring-1 ring-petrol-200 ring-inset hover:bg-petrol-200/70 dark:ring-petrol-400/70',
-  ghost: 'text-ink-600 hover:bg-paper-200 hover:text-ink-900',
-  danger: 'bg-berry-500 text-onaccent hover:bg-berry-700',
+    'bg-petrol-50 text-petrol-700 border border-petrol-200/80 hover:bg-petrol-200/60 active:scale-[0.98] dark:border-petrol-400/40',
+  ghost: 'text-ink-600 hover:bg-paper-200/80 hover:text-ink-900 active:scale-[0.98]',
+  danger: 'bg-berry-500 text-white hover:bg-berry-700 active:scale-[0.98]',
   'danger-ghost':
-    'text-berry-500 ring-1 ring-berry-500/25 ring-inset hover:bg-berry-100 hover:text-berry-700',
+    'text-berry-500 border border-berry-500/30 hover:bg-berry-100 hover:text-berry-700 active:scale-[0.98]',
 };
 
 const SIZES: Record<ButtonSize, string> = {
-  sm: 'h-9 gap-1.5 px-3 text-xs',
-  md: 'h-10 gap-2 px-4 text-sm',
+  sm: 'h-8 gap-1.5 px-3 text-xs font-semibold rounded-md',
+  md: 'h-9 gap-2 px-4 text-sm font-semibold rounded-md',
 };
 
 export default function Button({
@@ -35,7 +35,7 @@ export default function Button({
   return (
     <button
       type="button"
-      className={`inline-flex items-center justify-center rounded-lg font-medium transition-colors duration-150 max-sm:min-h-11 disabled:pointer-events-none disabled:opacity-50 ${VARIANTS[variant]} ${SIZES[size]} ${className}`}
+      className={`inline-flex items-center justify-center transition-all duration-120 max-sm:min-h-11 disabled:pointer-events-none disabled:opacity-50 select-none ${VARIANTS[variant]} ${SIZES[size]} ${className}`}
       {...rest}
     >
       {children}

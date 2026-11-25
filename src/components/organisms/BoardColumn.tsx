@@ -130,13 +130,13 @@ export default function BoardColumn({
         setOver(false);
         onDropCard(list.public_id);
       }}
-      className={`relative flex h-full max-h-full min-w-0 snap-start flex-col rounded-xl transition-colors duration-150 ${
+      className={`relative flex h-full max-h-full min-w-0 snap-start flex-col rounded-xl border transition-colors duration-150 ${
         over && draggingId !== null
-          ? 'bg-petrol-50 ring-2 ring-petrol-400'
-          : 'bg-paper-200 ring-1 ring-paper-300/70 dark:ring-paper-400/40'
+          ? 'bg-petrol-50/90 border-dashed border-petrol-500 ring-2 ring-petrol-400/50'
+          : 'bg-paper-200 border-paper-300/70 dark:border-paper-400/20 shadow-xs'
       }`}
     >
-      <header className="flex shrink-0 items-center gap-2 px-3 py-2.5">
+      <header className="flex shrink-0 items-center gap-2 px-3.5 py-3">
         {renaming ? (
           <input
             ref={renameRef}
@@ -154,26 +154,26 @@ export default function BoardColumn({
                 setRenaming(false);
               }
             }}
-            className="min-w-0 flex-1 rounded-md bg-paper-50 px-1.5 py-0.5 text-[13px] font-semibold tracking-tight text-ink-900 ring-1 ring-petrol-400 focus:outline-none"
+            className="min-w-0 flex-1 rounded-md bg-paper-50 px-2 py-1 text-[13px] font-semibold tracking-tight text-ink-900 ring-2 ring-petrol-500 focus:outline-none"
           />
         ) : (
           <>
             {done && (
               <Icon
                 name="check"
-                className="size-3.5 shrink-0 text-mint-600"
+                className="size-4 shrink-0 text-mint-600"
                 aria-hidden="true"
               />
             )}
-            <h2 className="min-w-0 truncate text-[13px] font-semibold tracking-[-0.01em] text-ink-800">
+            <h2 className="min-w-0 truncate text-[13.5px] font-semibold tracking-[-0.01em] text-ink-900">
               {list.title}
             </h2>
-            <span className="rounded-full bg-black/5 px-1.5 py-0.5 text-[11px] font-medium text-ink-400 tabular-nums dark:bg-white/10">
+            <span className="rounded-full bg-paper-300/70 px-2 py-0.5 text-[11px] font-semibold text-ink-600 tabular-nums">
               {cards.length}
             </span>
             {overdue > 0 && (
               <span
-                className="size-1.5 rounded-full bg-berry-500"
+                className="size-2 rounded-full bg-berry-500 ring-2 ring-paper-50"
                 title={t('column.overdueCount', { count: overdue })}
               >
                 <span className="sr-only">
@@ -182,7 +182,7 @@ export default function BoardColumn({
               </span>
             )}
             {matches > 0 && (
-              <span className="inline-flex shrink-0 items-center gap-1 rounded-full bg-petrol-600 px-1.5 py-0.5 text-[11px] font-medium text-onaccent tabular-nums">
+              <span className="inline-flex shrink-0 items-center gap-1 rounded-full bg-petrol-600 px-2 py-0.5 text-[11px] font-semibold text-onaccent tabular-nums">
                 {matches}
                 <span className="sr-only">
                   {t('column.highlightCount', { count: matches })}
@@ -192,12 +192,12 @@ export default function BoardColumn({
           </>
         )}
 
-        <div className="ml-auto flex shrink-0 items-center">
+        <div className="ml-auto flex shrink-0 items-center gap-0.5">
           <IconButton
             icon="plus"
             label={t('column.addTo', { list: list.title })}
             onClick={() => setAdding(true)}
-            className="size-7"
+            className="size-7 rounded-md hover:bg-paper-300/60 max-md:min-h-8 max-md:min-w-8"
           />
           <MenuPopover
             label={t('list.actions', { list: list.title })}
@@ -206,7 +206,7 @@ export default function BoardColumn({
         </div>
       </header>
 
-      <div className="flex min-h-0 flex-1 flex-col gap-2 overflow-y-auto px-2 pb-2 scrollbar-slim">
+      <div className="flex min-h-0 flex-1 flex-col gap-2 overflow-y-auto px-2.5 pb-2.5 scrollbar-slim">
         {cards.map((card) => (
           <TaskCard
             key={card.public_id}

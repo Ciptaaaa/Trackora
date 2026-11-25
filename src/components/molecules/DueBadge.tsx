@@ -8,10 +8,10 @@ interface DueBadgeProps {
 }
 
 const TONES: Record<Exclude<DueState, 'none'>, string> = {
-  overdue: 'bg-berry-100 text-berry-700',
-  today: 'bg-saffron-100 text-saffron-600',
-  soon: 'bg-saffron-100 text-saffron-600',
-  upcoming: 'bg-paper-200 text-ink-400',
+  overdue: 'bg-berry-100 text-berry-700 border-berry-500/20',
+  today: 'bg-saffron-100 text-saffron-600 border-saffron-500/20',
+  soon: 'bg-saffron-100 text-saffron-600 border-saffron-500/20',
+  upcoming: 'bg-paper-200/90 text-ink-600 border-paper-300',
 };
 
 export default function DueBadge({ dueDate }: DueBadgeProps) {
@@ -21,9 +21,12 @@ export default function DueBadge({ dueDate }: DueBadgeProps) {
 
   return (
     <span
-      className={`inline-flex items-center gap-1 rounded-md px-1.5 py-0.5 text-[11px] font-medium tracking-tight tabular-nums ${TONES[state]}`}
+      className={`inline-flex items-center gap-1 rounded-md px-1.5 py-0.5 text-[11px] font-semibold tracking-tight tabular-nums border ${TONES[state]}`}
     >
-      {state === 'overdue' && <Icon name="alert" className="size-3" />}
+      <Icon
+        name={state === 'overdue' ? 'alert' : 'calendar'}
+        className="size-3 shrink-0"
+      />
       {formatDueLabel(dueDate, locale, t)}
     </span>
   );

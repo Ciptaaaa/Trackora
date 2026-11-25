@@ -41,7 +41,7 @@ export default function Avatar({ user, size = 'xs', tone = 'default' }: AvatarPr
 
   return (
     <span
-      className={`inline-flex items-center justify-center rounded-full font-semibold text-onaccent ring-2 ${ringClass} ${sizeClass} ${tintFor(user.public_id)}`}
+      className={`inline-flex items-center justify-center rounded-full font-bold text-white shadow-2xs select-none ring-2 ${ringClass} ${sizeClass} ${tintFor(user.public_id)}`}
       title={user.name}
     >
       <span aria-hidden="true">{initialsOf(user.name)}</span>

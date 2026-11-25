@@ -247,16 +247,17 @@ export default function CardDetail({
           role="dialog"
           aria-modal="true"
           aria-label={card.title}
-          className="relative flex max-h-[92dvh] w-full flex-col rounded-t-2xl bg-paper-50 shadow-2xl sm:h-full sm:max-h-none sm:w-full sm:max-w-lg sm:rounded-none"
+          className="relative flex max-h-[92dvh] w-full flex-col rounded-t-2xl bg-paper-50 shadow-2xl sm:h-full sm:max-h-none sm:w-full sm:max-w-xl sm:rounded-l-2xl sm:border-l sm:border-paper-300/80 overscroll-contain"
         >
           <span
-            className="mx-auto mt-2 h-1 w-9 shrink-0 rounded-full bg-paper-300 sm:hidden"
+            className="mx-auto mt-2.5 h-1.5 w-10 shrink-0 rounded-full bg-paper-300 sm:hidden"
             aria-hidden="true"
           />
 
-          <header className="flex shrink-0 items-start gap-3 border-b border-paper-300 px-5 py-4">
+          <header className="flex shrink-0 items-start gap-3 border-b border-paper-300 px-4 py-4 sm:px-6 sm:py-5">
             <div className="min-w-0 flex-1">
-              <span className="text-[11px] font-medium text-ink-400">
+              <span className="inline-flex items-center gap-1.5 rounded-md bg-paper-200/90 px-2 py-0.5 text-[11px] font-semibold text-ink-600">
+                <Icon name="board" className="size-3 text-ink-400" />
                 {list?.title ?? t('detail.noList')}
               </span>
               {editing ? (
@@ -266,18 +267,18 @@ export default function CardDetail({
                   value={title}
                   disabled={saving}
                   onChange={(event) => setTitle(event.target.value)}
-                  className="mt-1 text-lg font-semibold"
+                  className="mt-2 text-base sm:text-lg font-semibold"
                 />
               ) : (
-                <h2 className="mt-1 text-xl leading-snug font-semibold tracking-[-0.02em] text-ink-900">
+                <h2 className="mt-2 text-lg sm:text-xl leading-snug font-bold tracking-tight text-ink-900">
                   {card.title}
                 </h2>
               )}
             </div>
-            <IconButton icon="close" label={t('detail.close')} onClick={onClose} />
+            <IconButton icon="close" label={t('detail.close')} onClick={onClose} className="rounded-lg hover:bg-paper-200" />
           </header>
 
-          <div className="flex-1 space-y-5 overflow-y-auto px-5 py-5 scrollbar-slim">
+          <div className="flex-1 space-y-6 overflow-y-auto px-4 py-5 sm:px-6 sm:py-6 scrollbar-slim">
             <DetailSection title={t('detail.description')}>
               {editing ? (
                 <TextArea
@@ -304,7 +305,7 @@ export default function CardDetail({
                   value={dueDate}
                   disabled={saving}
                   onChange={(event) => setDueDate(event.target.value)}
-                  className="w-full rounded-lg bg-paper-50 px-3 py-2 text-sm text-ink-900 ring-1 ring-paper-300 ring-inset transition hover:ring-paper-400 focus:ring-petrol-400 dark:ring-paper-400"
+                  className="w-full rounded-lg border border-paper-300 bg-paper-50 px-3 py-2 text-base sm:text-sm text-ink-900 shadow-2xs transition hover:border-paper-400 focus:border-petrol-500 focus:ring-2 focus:ring-petrol-500/20 focus:outline-none dark:border-paper-400"
                 />
               ) : card.due_date !== null ? (
                 <DueBadge dueDate={card.due_date} />
@@ -409,17 +410,17 @@ export default function CardDetail({
                   {attachments.map((attachment) => (
                     <li
                       key={attachment.public_id}
-                      className="flex items-center gap-2 rounded-lg bg-paper-100 px-2.5 py-2"
+                      className="flex items-center gap-2.5 rounded-lg border border-paper-300/80 bg-paper-50 p-2.5 trello-card hover:border-paper-400 dark:border-paper-400/40"
                     >
                       <Icon
                         name="paperclip"
-                        className="size-3.5 shrink-0 text-ink-400"
+                        className="size-4 shrink-0 text-ink-400"
                       />
                       <a
                         href={attachment.file}
                         target="_blank"
                         rel="noreferrer"
-                        className="min-w-0 flex-1 truncate text-xs text-ink-600 hover:underline"
+                        className="min-w-0 flex-1 truncate text-xs font-semibold text-petrol-700 hover:underline"
                       >
                         {attachment.file.split('/').pop() ?? t('detail.attachment')}
                       </a>
@@ -427,7 +428,7 @@ export default function CardDetail({
                         icon="trash"
                         label={t('detail.removeAttachment')}
                         onClick={() => void handleDeleteAttachment(attachment)}
-                        className="size-7 shrink-0"
+                        className="size-7 shrink-0 text-ink-400 hover:text-berry-600"
                       />
                     </li>
                   ))}
@@ -448,7 +449,7 @@ export default function CardDetail({
             )}
           </div>
 
-          <footer className="flex shrink-0 items-center gap-2 border-t border-paper-300 px-5 py-3 pb-[max(0.75rem,env(safe-area-inset-bottom))] sm:pb-3">
+          <footer className="flex shrink-0 items-center gap-2 border-t border-paper-300 px-4 py-3 pb-[max(1rem,env(safe-area-inset-bottom))] sm:px-6 sm:py-4 sm:pb-4">
             {editing ? (
               <>
                 <Button size="sm" disabled={saving} onClick={() => void handleSave()}>

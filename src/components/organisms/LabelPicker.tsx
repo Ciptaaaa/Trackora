@@ -14,6 +14,7 @@ interface LabelPickerProps {
   onClose: () => void;
   onChange: Dispatch<SetStateAction<Label[]>>;
 }
+
 export default function LabelPicker({
   open,
   cardPublicId,
@@ -49,6 +50,7 @@ export default function LabelPicker({
       live = false;
     };
   }, [open, t]);
+
   async function toggle(label: Label) {
     const isOn = selected.some((item) => item.public_id === label.public_id);
     setPendingId(label.public_id);
@@ -82,11 +84,11 @@ export default function LabelPicker({
           <Spinner label={t('app.loading')} size="sm" />
         </div>
       ) : catalogue.length === 0 ? (
-        <p className="rounded-lg border border-dashed border-paper-400/60 px-3 py-5 text-center text-[11px] leading-relaxed text-ink-400">
+        <p className="rounded-lg border border-dashed border-paper-400/60 px-3 py-5 text-center text-xs leading-relaxed text-ink-400">
           {t('label.empty')}
         </p>
       ) : (
-        <ul className="space-y-1">
+        <ul className="space-y-1.5">
           {catalogue.map((label) => {
             const isOn = selected.some(
               (item) => item.public_id === label.public_id,
@@ -99,20 +101,22 @@ export default function LabelPicker({
                   aria-checked={isOn}
                   disabled={pendingId !== null}
                   onClick={() => void toggle(label)}
-                  className={`flex min-h-9 w-full items-center gap-2.5 rounded-lg px-2.5 py-2 text-left transition-colors disabled:opacity-50 max-md:min-h-11 ${
-                    isOn ? 'bg-petrol-50' : 'hover:bg-paper-100'
+                  className={`flex min-h-10 w-full items-center gap-3 rounded-lg px-3 py-2 text-left transition-all disabled:opacity-50 ${
+                    isOn
+                      ? 'border-2 border-petrol-600 bg-petrol-50/70 shadow-xs'
+                      : 'border border-paper-300 hover:border-paper-400 hover:bg-paper-100/60'
                   }`}
                 >
                   <span
-                    className="size-3 shrink-0 rounded-full"
+                    className="h-4 w-6 shrink-0 rounded-sm shadow-2xs"
                     style={{ backgroundColor: label.color }}
                     aria-hidden="true"
                   />
-                  <span className="min-w-0 flex-1 truncate text-xs font-medium text-ink-800">
+                  <span className="min-w-0 flex-1 truncate text-xs font-semibold text-ink-900">
                     {label.name}
                   </span>
                   {isOn && (
-                    <Icon name="check" className="size-3.5 shrink-0 text-petrol-600" />
+                    <Icon name="check" className="size-4 shrink-0 text-petrol-600" />
                   )}
                 </button>
               </li>

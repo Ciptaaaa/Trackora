@@ -95,7 +95,7 @@ export default function AssigneePicker({
         aria-label={t('board.searchUser')}
         autoComplete="off"
         onChange={(event) => setQuery(event.target.value)}
-        className="mb-3 w-full rounded-lg bg-paper-50 px-3 py-2 text-sm text-ink-900 ring-1 ring-paper-300 ring-inset transition placeholder:text-ink-400 hover:ring-paper-400 focus:ring-petrol-400 dark:ring-paper-400"
+        className="mb-3 w-full rounded-lg border border-paper-300 bg-paper-50 px-3.5 py-2 text-base sm:text-sm text-ink-900 shadow-2xs transition placeholder:text-ink-400 hover:border-paper-400 focus:border-petrol-500 focus:ring-2 focus:ring-petrol-500/20 focus:outline-none dark:border-paper-400"
       />
 
       {loading ? (
@@ -103,7 +103,7 @@ export default function AssigneePicker({
           <Spinner label={t('app.loading')} size="sm" />
         </div>
       ) : results.length === 0 ? (
-        <p className="rounded-lg border border-dashed border-paper-400/60 px-3 py-5 text-center text-[11px] leading-relaxed text-ink-400">
+        <p className="rounded-lg border border-dashed border-paper-400/60 px-3 py-5 text-center text-xs leading-relaxed text-ink-400">
           {t('board.noUsers')}
         </p>
       ) : (
@@ -120,13 +120,15 @@ export default function AssigneePicker({
                   aria-checked={isOn}
                   disabled={pendingId !== null}
                   onClick={() => void toggle(user)}
-                  className={`flex min-h-9 w-full items-center gap-2.5 rounded-lg px-2 py-2 text-left transition-colors disabled:opacity-50 max-md:min-h-11 ${
-                    isOn ? 'bg-petrol-50' : 'hover:bg-paper-100'
+                  className={`flex min-h-11 w-full items-center gap-3 rounded-lg px-2.5 py-2 text-left transition-all disabled:opacity-50 ${
+                    isOn
+                      ? 'border border-petrol-300 bg-petrol-50/80 shadow-2xs'
+                      : 'border border-transparent hover:border-paper-300 hover:bg-paper-100/70'
                   }`}
                 >
                   <Avatar user={user} size="sm" />
                   <span className="min-w-0 flex-1">
-                    <span className="block truncate text-xs font-medium text-ink-900">
+                    <span className="block truncate text-xs font-semibold text-ink-900">
                       {user.name}
                     </span>
                     <span className="block truncate text-[11px] text-ink-400">
@@ -134,7 +136,7 @@ export default function AssigneePicker({
                     </span>
                   </span>
                   {isOn && (
-                    <Icon name="check" className="size-3.5 shrink-0 text-petrol-600" />
+                    <Icon name="check" className="size-4 shrink-0 text-petrol-600" />
                   )}
                 </button>
               </li>

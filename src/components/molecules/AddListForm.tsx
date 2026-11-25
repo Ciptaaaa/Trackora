@@ -6,6 +6,7 @@ import { useT } from '../../i18n/LocaleContext';
 interface AddListFormProps {
   onSubmit: (title: string) => void;
 }
+
 export default function AddListForm({ onSubmit }: AddListFormProps) {
   const t = useT();
   const [open, setOpen] = useState(false);
@@ -37,16 +38,16 @@ export default function AddListForm({ onSubmit }: AddListFormProps) {
       <button
         type="button"
         onClick={() => setOpen(true)}
-        className="flex h-full min-h-24 w-full flex-col items-center justify-center gap-1.5 rounded-xl border border-dashed border-paper-400/70 text-xs font-medium text-ink-400 transition-colors hover:border-petrol-400 hover:bg-paper-100/70 hover:text-ink-800"
+        className="flex h-12 w-full items-center gap-2 rounded-xl border border-paper-300/80 bg-paper-200/80 px-4 text-xs font-semibold text-ink-700 shadow-xs transition-all hover:bg-paper-200 hover:text-ink-900 dark:border-paper-400/20"
       >
-        <Icon name="plus" className="size-4" />
+        <Icon name="plus" className="size-4 text-ink-600" />
         {t('list.add')}
       </button>
     );
   }
 
   return (
-    <div className="flex h-fit flex-col rounded-xl bg-paper-200 p-2 ring-1 ring-paper-300 dark:ring-paper-400">
+    <div className="flex h-fit flex-col rounded-xl border border-paper-300/80 bg-paper-200 p-2.5 shadow-sm dark:border-paper-400/20">
       <input
         ref={inputRef}
         value={title}
@@ -60,15 +61,20 @@ export default function AddListForm({ onSubmit }: AddListFormProps) {
           }
           if (event.key === 'Escape') cancel();
         }}
-        className="w-full rounded-lg bg-paper-50 px-2.5 py-2 text-sm text-ink-900 ring-1 ring-paper-300 ring-inset transition placeholder:text-ink-400 focus:ring-petrol-400 dark:ring-paper-400"
+        className="w-full rounded-lg border border-paper-300 bg-paper-50 px-3 py-2 text-base sm:text-sm text-ink-900 placeholder:text-ink-400 focus:border-petrol-500 focus:ring-1 focus:ring-petrol-500 focus:outline-none dark:border-paper-400"
       />
-      <div className="mt-1.5 flex items-center gap-1.5">
+      <div className="mt-2 flex items-center gap-2">
         <Button size="sm" onClick={commit}>
           {t('common.add')}
         </Button>
-        <Button size="sm" variant="ghost" onClick={cancel}>
-          {t('common.cancel')}
-        </Button>
+        <button
+          type="button"
+          onClick={cancel}
+          aria-label={t('common.cancel')}
+          className="flex size-8 items-center justify-center rounded-md text-ink-400 transition-colors hover:bg-paper-300/60 hover:text-ink-900"
+        >
+          <Icon name="close" className="size-4" />
+        </button>
       </div>
     </div>
   );

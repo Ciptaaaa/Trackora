@@ -175,7 +175,7 @@ export default function BoardDialog({
             value={dueDate}
             onChange={(event) => setDueDate(event.target.value)}
             disabled={saving}
-            className="w-full rounded-lg bg-paper-50 px-3 py-2 text-sm text-ink-900 ring-1 ring-paper-300 ring-inset transition hover:ring-paper-400 focus:ring-petrol-400 dark:ring-paper-400"
+            className="w-full rounded-lg border border-paper-300 bg-paper-50 px-3 py-2 text-base sm:text-sm text-ink-900 shadow-2xs transition hover:border-paper-400 focus:border-petrol-500 focus:ring-2 focus:ring-petrol-500/20 focus:outline-none dark:border-paper-400"
           />
         </div>
 
@@ -222,7 +222,7 @@ export default function BoardDialog({
               onChange={(event) => setQuery(event.target.value)}
               disabled={saving}
               autoComplete="off"
-              className="w-full rounded-lg bg-paper-50 px-3 py-2 text-sm text-ink-900 ring-1 ring-paper-300 ring-inset transition placeholder:text-ink-400 hover:ring-paper-400 focus:ring-petrol-400 dark:ring-paper-400"
+              className="w-full rounded-lg border border-paper-300 bg-paper-50 px-3.5 py-2 text-base sm:text-sm text-ink-900 shadow-2xs transition placeholder:text-ink-400 hover:border-paper-400 focus:border-petrol-500 focus:ring-2 focus:ring-petrol-500/20 focus:outline-none dark:border-paper-400"
             />
 
             {showResults && (

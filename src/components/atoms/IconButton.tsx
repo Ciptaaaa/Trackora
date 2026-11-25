@@ -17,17 +17,17 @@ export default function IconButton({
   const toneClass =
     tone === 'inverse'
       ? 'text-nav-muted hover:bg-nav-raised hover:text-nav-text'
-      : 'text-ink-400 hover:bg-paper-200 hover:text-ink-900';
+      : 'text-ink-600 hover:bg-paper-200 hover:text-ink-900';
 
   return (
     <button
       type="button"
       aria-label={label}
       title={label}
-      className={`inline-flex size-8 shrink-0 items-center justify-center rounded-lg transition-colors duration-150 max-md:min-h-11 max-md:min-w-11 ${toneClass} ${className}`}
+      className={`inline-flex size-8 shrink-0 items-center justify-center rounded-lg transition-all duration-120 active:scale-95 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-petrol-500 max-md:min-h-11 max-md:min-w-11 ${toneClass} ${className}`}
       {...rest}
     >
-      <Icon name={icon} />
+      <Icon name={icon} className="size-4" />
     </button>
   );
 }

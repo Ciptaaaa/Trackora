@@ -4,18 +4,24 @@ interface DetailSectionProps {
   title: string;
   action?: ReactNode;
   children: ReactNode;
+  icon?: ReactNode;
 }
+
 export default function DetailSection({
   title,
   action,
   children,
+  icon,
 }: DetailSectionProps) {
   return (
-    <section>
-      <div className="mb-2 flex min-h-6 items-center gap-2">
-        <h3 className="flex-1 text-xs font-medium text-ink-400">
-          {title}
-        </h3>
+    <section className="space-y-2">
+      <div className="flex min-h-6 items-center justify-between gap-2">
+        <div className="flex items-center gap-1.5">
+          {icon}
+          <h3 className="text-xs font-semibold tracking-wider text-ink-600 uppercase">
+            {title}
+          </h3>
+        </div>
         {action}
       </div>
       {children}

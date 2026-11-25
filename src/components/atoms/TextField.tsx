@@ -21,7 +21,7 @@ export default function TextField({
       <label
         htmlFor={fieldId}
         className={
-          hideLabel ? 'sr-only' : 'mb-1.5 block text-xs font-medium text-ink-600'
+          hideLabel ? 'sr-only' : 'mb-1.5 block text-xs font-semibold text-ink-700'
         }
       >
         {label}
@@ -29,10 +29,10 @@ export default function TextField({
       <input
         id={fieldId}
         readOnly={readonly}
-        className={`w-full rounded-lg px-3 py-2 text-sm ring-1 ring-inset transition placeholder:text-ink-400 ${
+        className={`w-full rounded-lg border px-3 py-2 text-base sm:text-sm transition-all placeholder:text-ink-400 focus:outline-none ${
           readonly
-            ? 'cursor-not-allowed bg-paper-100 text-ink-400 ring-paper-300 select-text'
-            : 'bg-paper-50 text-ink-900 ring-paper-300 hover:ring-paper-400 focus:bg-paper-50 focus:ring-petrol-400 dark:ring-paper-400'
+            ? 'cursor-not-allowed border-paper-300 bg-paper-100 text-ink-400 select-text'
+            : 'border-paper-300 bg-paper-50 text-ink-900 shadow-2xs hover:border-paper-400 focus:border-petrol-500 focus:ring-2 focus:ring-petrol-500/20 dark:border-paper-400'
         } ${className}`}
         {...rest}
       />

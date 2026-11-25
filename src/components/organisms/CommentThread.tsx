@@ -12,6 +12,7 @@ import type { Comment } from '../../types/domain';
 interface CommentThreadProps {
   cardPublicId: string;
 }
+
 export default function CommentThread({ cardPublicId }: CommentThreadProps) {
   const t = useT();
   const [comments, setComments] = useState<Comment[]>([]);
@@ -74,17 +75,22 @@ export default function CommentThread({ cardPublicId }: CommentThreadProps) {
   }
 
   return (
-    <div className="space-y-3">
+    <div className="space-y-4">
       {loading ? (
         <div className="flex justify-center py-4">
           <Spinner label={t('app.loading')} size="sm" />
         </div>
       ) : comments.length === 0 ? (
-        <p className="text-sm text-ink-400">{t('detail.noComments')}</p>
+        <p className="rounded-lg border border-dashed border-paper-300/80 p-4 text-center text-xs text-ink-400">
+          {t('detail.noComments')}
+        </p>
       ) : (
-        <ul className="space-y-3">
+        <ul className="space-y-2.5">
           {comments.map((comment) => (
-            <li key={comment.public_id} className="flex gap-2.5">
+            <li
+              key={comment.public_id}
+              className="flex gap-3 rounded-xl border border-paper-300/70 bg-paper-100/60 p-3 shadow-2xs"
+            >
               <Avatar
                 user={{
                   public_id: comment.author.public_id,
@@ -95,8 +101,8 @@ export default function CommentThread({ cardPublicId }: CommentThreadProps) {
                 size="sm"
               />
               <div className="min-w-0 flex-1">
-                <div className="flex items-center gap-2">
-                  <span className="truncate text-xs font-semibold text-ink-800">
+                <div className="flex items-center justify-between gap-2">
+                  <span className="truncate text-xs font-semibold text-ink-900">
                     {comment.author.name}
                   </span>
                   {comment.author.public_id === currentUserId && (
@@ -104,11 +110,11 @@ export default function CommentThread({ cardPublicId }: CommentThreadProps) {
                       icon="trash"
                       label={t('detail.commentDelete')}
                       onClick={() => void handleDelete(comment)}
-                      className="ml-auto size-6 shrink-0"
+                      className="size-6 shrink-0 text-ink-400 hover:text-berry-600"
                     />
                   )}
                 </div>
-                <p className="mt-0.5 text-sm leading-relaxed wrap-break-words text-ink-600">
+                <p className="mt-1 text-xs sm:text-[13px] leading-relaxed wrap-break-words text-ink-800">
                   {comment.message}
                 </p>
               </div>
@@ -117,7 +123,7 @@ export default function CommentThread({ cardPublicId }: CommentThreadProps) {
         </ul>
       )}
 
-      <div className="rounded-lg bg-paper-50 p-2 ring-1 ring-paper-300 focus-within:ring-petrol-400 dark:ring-paper-400">
+      <div className="rounded-xl border border-paper-300 bg-paper-50 p-3 trello-card focus-within:border-petrol-500 focus-within:ring-2 focus-within:ring-petrol-500/20">
         <textarea
           rows={2}
           value={draft}
@@ -131,9 +137,9 @@ export default function CommentThread({ cardPublicId }: CommentThreadProps) {
               void handleSend();
             }
           }}
-          className="w-full resize-none bg-transparent text-sm text-ink-900 placeholder:text-ink-400 focus:outline-none"
+          className="w-full resize-none bg-transparent text-base sm:text-sm text-ink-900 placeholder:text-ink-400 focus:outline-none"
         />
-        <div className="mt-1 flex justify-end">
+        <div className="mt-2 flex justify-end">
           <Button
             size="sm"
             disabled={sending || draft.trim() === ''}

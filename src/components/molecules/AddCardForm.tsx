@@ -69,16 +69,16 @@ export default function AddCardForm({
       <button
         type="button"
         onClick={() => onOpenChange(true)}
-        className="flex min-h-11 w-full items-center gap-1.5 rounded-lg px-2.5 text-xs font-medium text-ink-400 transition-colors hover:bg-paper-100 hover:text-ink-800"
+        className="flex min-h-9 w-full items-center gap-1.5 rounded-lg px-2.5 py-1.5 text-[13px] font-medium text-ink-600 transition-colors hover:bg-paper-300/60 hover:text-ink-900"
       >
-        <Icon name="plus" className="size-3.5" />
+        <Icon name="plus" className="size-4 text-ink-600" />
         {t('column.addCard')}
       </button>
     );
   }
 
   return (
-    <div className="rounded-xl bg-paper-50 p-2.5 shadow-sm ring-1 ring-paper-300 dark:ring-paper-400">
+    <div className="rounded-xl border border-paper-300/80 bg-paper-50 p-3 trello-card">
       <textarea
         ref={titleRef}
         rows={2}
@@ -93,13 +93,13 @@ export default function AddCardForm({
           }
           if (event.key === 'Escape') close();
         }}
-        className="w-full resize-none bg-transparent text-sm text-ink-900 placeholder:text-ink-400 focus:outline-none"
+        className="w-full resize-none bg-transparent text-base sm:text-[13.5px] leading-snug text-ink-900 placeholder:text-ink-400 focus:outline-none"
       />
 
       {expanded ? (
-        <div className="mt-1.5 space-y-2.5 border-t border-paper-200 pt-2">
+        <div className="mt-2 space-y-2.5 border-t border-paper-200 pt-2.5">
           <label className="block">
-            <span className="mb-1 block text-[11px] font-medium text-ink-600">
+            <span className="mb-1 block text-[11px] font-semibold text-ink-600">
               {t('column.cardDescription')}
             </span>
             <textarea
@@ -111,13 +111,13 @@ export default function AddCardForm({
               onKeyDown={(event) => {
                 if (event.key === 'Escape') close();
               }}
-              className="w-full resize-none rounded-md bg-paper-100 px-2 py-1.5 text-[13px] leading-relaxed text-ink-800 ring-1 ring-paper-300 ring-inset placeholder:text-ink-400 focus:bg-paper-50 focus:outline-none dark:ring-paper-400"
+              className="w-full resize-none rounded-md border border-paper-300 bg-paper-100 px-2.5 py-2 text-base sm:text-[13px] leading-relaxed text-ink-900 placeholder:text-ink-400 focus:border-petrol-500 focus:bg-paper-50 focus:outline-none dark:border-paper-400"
             />
           </label>
 
           <div>
             <label className="block">
-              <span className="mb-1 flex items-center gap-1.5 text-[11px] font-medium text-ink-600">
+              <span className="mb-1 flex items-center gap-1.5 text-[11px] font-semibold text-ink-600">
                 <Icon name="calendar" className="size-3.5 text-ink-400" />
                 {t('column.cardDue')}
                 <span className="font-normal text-ink-400">{t('column.optional')}</span>
@@ -135,14 +135,14 @@ export default function AddCardForm({
                     }
                     if (event.key === 'Escape') close();
                   }}
-                  className="min-w-0 flex-1 rounded-md bg-paper-100 px-2 py-1.5 text-[12px] text-ink-800 ring-1 ring-paper-300 ring-inset focus:bg-paper-50 focus:outline-none dark:ring-paper-400"
+                  className="min-w-0 flex-1 rounded-md border border-paper-300 bg-paper-100 px-2.5 py-2 sm:py-1.5 text-base sm:text-[12px] text-ink-900 focus:border-petrol-500 focus:bg-paper-50 focus:outline-none dark:border-paper-400"
                 />
                 {dueDate !== '' && (
                   <button
                     type="button"
                     onClick={() => setDueDate('')}
                     aria-label={t('column.clearDue')}
-                    className="shrink-0 rounded p-1 text-ink-400 transition-colors hover:text-berry-500"
+                    className="flex size-8 shrink-0 items-center justify-center rounded p-1 text-ink-400 transition-colors hover:text-berry-500"
                   >
                     <Icon name="close" className="size-3.5" />
                   </button>
@@ -159,20 +159,25 @@ export default function AddCardForm({
         <button
           type="button"
           onClick={() => setExpanded(true)}
-          className="mt-1 flex w-full items-center gap-1.5 border-t border-paper-200 pt-1.5 text-[11px] font-medium text-ink-400 transition-colors hover:text-petrol-600"
+          className="mt-1 flex w-full items-center gap-1.5 border-t border-paper-200 pt-2 text-[11px] font-semibold text-ink-600 transition-colors hover:text-petrol-600"
         >
           <Icon name="plus" className="size-3" />
           {t('column.addDetails')}
         </button>
       )}
 
-      <div className="mt-2 flex items-center gap-1.5">
+      <div className="mt-2.5 flex items-center gap-2">
         <Button size="sm" onClick={commit}>
           {t('column.save')}
         </Button>
-        <Button size="sm" variant="ghost" onClick={close}>
-          {t('column.cancel')}
-        </Button>
+        <button
+          type="button"
+          onClick={close}
+          aria-label={t('column.cancel')}
+          className="flex size-8 items-center justify-center rounded-md p-1.5 text-ink-400 transition-colors hover:bg-paper-200 hover:text-ink-900"
+        >
+          <Icon name="close" className="size-4" />
+        </button>
       </div>
     </div>
   );

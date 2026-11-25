@@ -153,18 +153,18 @@ export default function LabelManager({
               {labels.map((label) => (
                 <li
                   key={label.public_id}
-                  className={`flex min-h-9 items-center gap-2.5 rounded-lg px-2 py-1.5 transition-colors ${
+                  className={`flex min-h-10 items-center gap-2.5 rounded-lg border px-3 py-1.5 transition-all ${
                     editingId === label.public_id
-                      ? 'bg-petrol-50 ring-1 ring-petrol-200'
-                      : 'hover:bg-paper-100'
+                      ? 'border-petrol-400 bg-petrol-50/70 shadow-xs'
+                      : 'border-paper-300/80 bg-paper-50 hover:bg-paper-100/70 shadow-2xs'
                   }`}
                 >
                   <span
-                    className="size-3 shrink-0 rounded-full"
+                    className="h-4 w-7 shrink-0 rounded-sm shadow-2xs"
                     style={{ backgroundColor: label.color }}
                     aria-hidden="true"
                   />
-                  <span className="min-w-0 flex-1 truncate text-xs font-medium text-ink-800">
+                  <span className="min-w-0 flex-1 truncate text-xs font-semibold text-ink-900">
                     {label.name}
                   </span>
                   <IconButton
@@ -179,7 +179,7 @@ export default function LabelManager({
                     label={t('label.delete', { name: label.name })}
                     disabled={busy}
                     onClick={() => void handleDelete(label)}
-                    className="size-7"
+                    className="size-7 text-ink-400 hover:text-berry-600"
                   />
                 </li>
               ))}

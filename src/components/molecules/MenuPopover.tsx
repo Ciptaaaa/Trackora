@@ -58,7 +58,7 @@ export default function MenuPopover({
         <div
           role="menu"
           aria-label={label}
-          className={`absolute top-full z-40 mt-1 w-44 overflow-hidden rounded-xl bg-paper-50 p-1 shadow-xl ring-1 ring-paper-300 dark:ring-paper-400 ${
+          className={`absolute top-full z-40 mt-1.5 w-48 overflow-hidden rounded-xl border border-paper-300/80 bg-paper-50 p-1.5 shadow-xl shadow-black/10 dark:border-paper-400/40 ${
             align === 'right' ? 'right-0' : 'left-0'
           }`}
         >
@@ -72,13 +72,13 @@ export default function MenuPopover({
                 setOpen(false);
                 action.onSelect();
               }}
-              className={`flex min-h-9 w-full items-center gap-2.5 rounded-lg px-2.5 py-2 text-left text-[13px] font-medium transition-colors disabled:pointer-events-none disabled:opacity-40 max-md:min-h-11 ${
+              className={`flex min-h-9 w-full items-center gap-2.5 rounded-lg px-2.5 py-2 text-left text-[13px] font-medium transition-colors disabled:pointer-events-none disabled:opacity-40 max-md:min-h-10 ${
                 action.tone === 'danger'
-                  ? 'text-berry-500 hover:bg-berry-100'
-                  : 'text-ink-600 hover:bg-paper-100 hover:text-ink-900'
+                  ? 'text-berry-700 hover:bg-berry-100/80'
+                  : 'text-ink-700 hover:bg-paper-100 hover:text-ink-900'
               }`}
             >
-              <Icon name={action.icon} className="size-3.5 shrink-0" />
+              <Icon name={action.icon} className="size-4 shrink-0" />
               <span className="truncate">{action.label}</span>
             </button>
           ))}

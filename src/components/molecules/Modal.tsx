@@ -52,7 +52,7 @@ export default function Modal({
   return (
     <div className="fixed inset-0 z-60 flex items-end justify-center sm:items-center sm:p-6">
       <div
-        className="absolute inset-0 bg-scrim"
+        className="absolute inset-0 bg-scrim/80 backdrop-blur-[2px] transition-opacity"
         onClick={onClose}
         aria-hidden="true"
       />
@@ -61,31 +61,31 @@ export default function Modal({
         role="dialog"
         aria-modal="true"
         aria-label={title}
-        className={`relative flex max-h-[92dvh] w-full flex-col rounded-t-2xl bg-paper-50 shadow-2xl sm:max-h-[84dvh] sm:rounded-2xl ${WIDTHS[size]}`}
+        className={`relative flex max-h-[92dvh] w-full flex-col rounded-t-2xl border border-paper-300/80 bg-paper-50 shadow-2xl sm:max-h-[85dvh] sm:rounded-2xl dark:border-paper-400/40 ${WIDTHS[size]}`}
       >
         <span
-          className="mx-auto mt-2 h-1 w-9 shrink-0 rounded-full bg-paper-300 sm:hidden"
+          className="mx-auto mt-2.5 h-1.5 w-10 shrink-0 rounded-full bg-paper-300 sm:hidden"
           aria-hidden="true"
         />
 
-        <header className="flex shrink-0 items-start gap-3 border-b border-paper-300 px-5 py-4">
+        <header className="flex shrink-0 items-start gap-3 border-b border-paper-300/80 px-5 py-4 sm:px-6 sm:py-4.5">
           <div className="min-w-0 flex-1">
-            <h2 className="truncate text-base leading-snug font-semibold tracking-[-0.01em] text-ink-900">
+            <h2 className="truncate text-base leading-snug font-bold tracking-tight text-ink-900">
               {title}
             </h2>
             {hint !== undefined && (
-              <p className="mt-0.5 text-xs leading-relaxed text-ink-400">{hint}</p>
+              <p className="mt-0.5 text-xs leading-relaxed text-ink-600">{hint}</p>
             )}
           </div>
-          <IconButton icon="close" label={t('common.close')} onClick={onClose} />
+          <IconButton icon="close" label={t('common.close')} onClick={onClose} className="rounded-lg hover:bg-paper-200" />
         </header>
 
-        <div className="min-h-0 flex-1 overflow-y-auto px-5 py-5 scrollbar-slim">
+        <div className="min-h-0 flex-1 overflow-y-auto px-5 py-5 sm:px-6 sm:py-6 scrollbar-slim">
           {children}
         </div>
 
         {footer !== undefined && (
-          <footer className="flex shrink-0 items-center justify-end gap-2 border-t border-paper-300 px-5 py-3 pb-[max(0.75rem,env(safe-area-inset-bottom))] sm:pb-3">
+          <footer className="flex shrink-0 items-center justify-end gap-2 border-t border-paper-300/80 px-5 py-3.5 pb-[max(0.75rem,env(safe-area-inset-bottom))] sm:px-6 sm:py-4 sm:pb-4">
             {footer}
           </footer>
         )}
