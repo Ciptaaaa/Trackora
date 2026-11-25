@@ -1,4 +1,5 @@
-import { useCallback, useEffect, useMemo, useState, type DragEvent } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState, type DragEvent } from 'react';
+import { toast } from 'sonner';
 import Sidebar from '../organisms/Sidebar';
 import Topbar from '../organisms/Topbar';
 import WeekSpine from '../organisms/WeekSpine';
@@ -72,6 +73,8 @@ export default function AppShell({
   const [boardDialog, setBoardDialog] = useState<Board | 'new' | null>(null);
   const [labelManagerOpen, setLabelManagerOpen] = useState(false);
   const [dataVersion, setDataVersion] = useState(0);
+  const knownBoardsRef = useRef<Map<string, string> | null>(null);
+  const selfMutatedBoardIdsRef = useRef<Set<string>>(new Set());
 
   const navOpen = drawerOpen || railExpanded;
 
@@ -99,14 +102,44 @@ export default function AppShell({
     },
     [activeBoardId],
   );
+  const syncBoards = useCallback(async (announceDiff: boolean) => {
+    const data = await getMyBoards();
+    const nextMap = new Map(data.map((board) => [board.public_id, board.title]));
+
+    if (announceDiff && knownBoardsRef.current !== null) {
+      const prevMap = knownBoardsRef.current;
+
+      for (const board of data) {
+        if (!prevMap.has(board.public_id) && !selfMutatedBoardIdsRef.current.has(board.public_id)) {
+          toast.info(t('board.toastInvited', { title: board.title }), {
+            action: {
+              label: t('board.openBoard'),
+              onClick: () => openBoard(board.public_id),
+            },
+          });
+        }
+      }
+
+      for (const [boardId, title] of prevMap) {
+        if (!nextMap.has(boardId) && !selfMutatedBoardIdsRef.current.has(boardId)) {
+          toast.warning(t('board.toastRemoved', { title }));
+        }
+      }
+
+      selfMutatedBoardIdsRef.current.clear();
+    }
+
+    knownBoardsRef.current = nextMap;
+    setBoards(data);
+    return data;
+  }, [t, openBoard]);
+
   useEffect(() => {
     let cancelled = false;
 
     async function loadBoards() {
       try {
-        const data = await getMyBoards();
-        if (cancelled) return;
-        setBoards(data);
+        await syncBoards(false);
       } catch (caught) {
         if (!cancelled) setLoadError(errorMessage(caught));
       } finally {
@@ -118,7 +151,27 @@ export default function AppShell({
     return () => {
       cancelled = true;
     };
-  }, [errorMessage]);
+  }, [syncBoards, errorMessage]);
+
+  useEffect(() => {
+    if (loading) return;
+
+    const refreshIfVisible = () => {
+      if (document.visibilityState === 'visible') {
+        void syncBoards(true).catch(() => undefined);
+      }
+    };
+
+    const interval = window.setInterval(refreshIfVisible, 30_000);
+    window.addEventListener('focus', refreshIfVisible);
+    document.addEventListener('visibilitychange', refreshIfVisible);
+
+    return () => {
+      window.clearInterval(interval);
+      window.removeEventListener('focus', refreshIfVisible);
+      document.removeEventListener('visibilitychange', refreshIfVisible);
+    };
+  }, [loading, syncBoards]);
   useEffect(() => {
     if (loading || boards.length === 0) return;
 
@@ -159,7 +212,14 @@ export default function AppShell({
         setLoadedBoardId(activeBoardId);
         const fatal = isFatalError(caught);
         const forbidden = caught instanceof ApiError && caught.isForbidden;
-        setLoadError(fatal || forbidden ? errorMessage(caught) : null);
+        if (forbidden) {
+          const msg = errorMessage(caught);
+          setLoadError(msg);
+          toast.error(msg);
+          void syncBoards(true).catch(() => undefined);
+        } else {
+          setLoadError(fatal ? errorMessage(caught) : null);
+        }
       } finally {
         if (!cancelled) setBoardLoading(false);
       }
@@ -406,6 +466,8 @@ export default function AppShell({
   }
 
   function handleBoardSaved(saved: Board) {
+    selfMutatedBoardIdsRef.current.add(saved.public_id);
+    knownBoardsRef.current?.set(saved.public_id, saved.title);
     const exists = boards.some((board) => board.public_id === saved.public_id);
     setBoards((current) =>
       exists
@@ -416,6 +478,8 @@ export default function AppShell({
   }
 
   function handleBoardDeleted(boardPublicId: string) {
+    selfMutatedBoardIdsRef.current.add(boardPublicId);
+    knownBoardsRef.current?.delete(boardPublicId);
     const remaining = boards.filter((board) => board.public_id !== boardPublicId);
     setBoards(remaining);
     if (activeBoardId === boardPublicId) {
