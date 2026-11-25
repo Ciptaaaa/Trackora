@@ -28,11 +28,41 @@ import {
   deleteAttachment,
   removeCardLabel,
   unassignUser,
+  getChecklists,
+  createChecklist,
+  updateChecklist,
+  deleteChecklist,
 } from '../../lib/api';
 import { describeError } from '../../lib/errors';
-import type { Card, List, Label, User, Attachment } from '../../types/domain';
+import type {
+  Card,
+  CardChecklist,
+  List,
+  Label,
+  User,
+  Attachment,
+} from '../../types/domain';
+
+const MAX_ATTACHMENT_BYTES = 10 * 1024 * 1024;
+const ALLOWED_ATTACHMENT_EXTENSIONS = new Set([
+  '.jpg',
+  '.jpeg',
+  '.png',
+  '.gif',
+  '.webp',
+  '.pdf',
+  '.txt',
+  '.doc',
+  '.docx',
+  '.xls',
+  '.xlsx',
+  '.zip',
+]);
+const ATTACHMENT_ACCEPT =
+  '.jpg,.jpeg,.png,.gif,.webp,.pdf,.txt,.doc,.docx,.xls,.xlsx,.zip';
 
 interface CardDetailProps {
+  boardId: string;
   card: Card | null;
   list: List | undefined;
   onClose: () => void;
@@ -42,6 +72,7 @@ interface CardDetailProps {
 }
 
 export default function CardDetail({
+  boardId,
   card,
   list,
   onClose,
@@ -58,6 +89,11 @@ export default function CardDetail({
   const [assignees, setAssignees] = useState<User[]>([]);
   const [attachments, setAttachments] = useState<Attachment[]>([]);
   const [loadingAttachments, setLoadingAttachments] = useState(false);
+  const [checklists, setChecklists] = useState<CardChecklist[]>([]);
+  const [loadingChecklists, setLoadingChecklists] = useState(false);
+  const [checklistDraft, setChecklistDraft] = useState('');
+  const [addingChecklist, setAddingChecklist] = useState(false);
+  const [pendingChecklistId, setPendingChecklistId] = useState<string | null>(null);
   const [uploading, setUploading] = useState(false);
   const [saving, setSaving] = useState(false);
   const [showLabelPicker, setShowLabelPicker] = useState(false);
@@ -101,6 +137,8 @@ export default function CardDetail({
     labelsRef.current = current.labels;
     assigneesRef.current = current.assignees;
     setAttachments([]);
+    setChecklists([]);
+    setChecklistDraft('');
     setEditing(false);
     setError(null);
 
@@ -115,6 +153,18 @@ export default function CardDetail({
       })
       .finally(() => {
         if (live) setLoadingAttachments(false);
+      });
+
+    setLoadingChecklists(true);
+    getChecklists(cardPublicId)
+      .then((fetched) => {
+        if (live) setChecklists(fetched);
+      })
+      .catch(() => {
+        if (live) setChecklists([]);
+      })
+      .finally(() => {
+        if (live) setLoadingChecklists(false);
       });
 
     function onKeyDown(event: KeyboardEvent) {
@@ -178,6 +228,20 @@ export default function CardDetail({
     const file = event.target.files[0];
     if (file === undefined) return;
 
+    const dotIndex = file.name.lastIndexOf('.');
+    const ext = dotIndex === -1 ? '' : file.name.slice(dotIndex).toLowerCase();
+    if (!ALLOWED_ATTACHMENT_EXTENSIONS.has(ext)) {
+      setError(t('detail.errFileType'));
+      event.target.value = '';
+      return;
+    }
+
+    if (file.size > MAX_ATTACHMENT_BYTES) {
+      setError(t('detail.errFileTooLarge'));
+      event.target.value = '';
+      return;
+    }
+
     setUploading(true);
     setError(null);
 
@@ -229,6 +293,64 @@ export default function CardDetail({
       );
     } catch (caught: unknown) {
       setError(describeError(caught, t));
+    }
+  }
+
+  async function handleAddChecklist() {
+    if (card === null) return;
+    const trimmed = checklistDraft.trim();
+    if (trimmed === '') return;
+
+    setAddingChecklist(true);
+    setError(null);
+    try {
+      const created = await createChecklist(card.public_id, {
+        title: trimmed,
+        position: checklists.length,
+      });
+      setChecklists((current) => [...current, created]);
+      setChecklistDraft('');
+    } catch (caught: unknown) {
+      setError(describeError(caught, t));
+    } finally {
+      setAddingChecklist(false);
+    }
+  }
+
+  async function handleToggleChecklist(item: CardChecklist) {
+    if (card === null) return;
+    const nextDone = !item.is_done;
+    setPendingChecklistId(item.public_id);
+    setError(null);
+
+    try {
+      const updated = await updateChecklist(card.public_id, item.public_id, {
+        is_done: nextDone,
+      });
+      setChecklists((current) =>
+        current.map((row) => (row.public_id === updated.public_id ? updated : row)),
+      );
+    } catch (caught: unknown) {
+      setError(describeError(caught, t));
+    } finally {
+      setPendingChecklistId(null);
+    }
+  }
+
+  async function handleDeleteChecklist(item: CardChecklist) {
+    if (card === null) return;
+    setPendingChecklistId(item.public_id);
+    setError(null);
+
+    try {
+      await deleteChecklist(card.public_id, item.public_id);
+      setChecklists((current) =>
+        current.filter((row) => row.public_id !== item.public_id),
+      );
+    } catch (caught: unknown) {
+      setError(describeError(caught, t));
+    } finally {
+      setPendingChecklistId(null);
     }
   }
 
@@ -390,6 +512,7 @@ export default function CardDetail({
                 <label>
                   <input
                     type="file"
+                    accept={ATTACHMENT_ACCEPT}
                     disabled={uploading}
                     onChange={handleUpload}
                     className="sr-only"
@@ -436,6 +559,102 @@ export default function CardDetail({
               ) : (
                 <p className="text-sm text-ink-400">{t('detail.noAttachments')}</p>
               )}
+            </DetailSection>
+
+            <DetailSection
+              title={t('detail.checklists')}
+              action={
+                checklists.length > 0 ? (
+                  <span className="text-xs font-medium text-ink-400 tabular-nums">
+                    {checklists.filter((item) => item.is_done).length}/{checklists.length}
+                  </span>
+                ) : undefined
+              }
+            >
+              {checklists.length > 0 && (
+                <div className="mb-3 h-1.5 w-full overflow-hidden rounded-full bg-paper-200">
+                  <div
+                    className="h-full rounded-full bg-petrol-600 transition-all duration-300"
+                    style={{
+                      width: `${Math.round(
+                        (checklists.filter((item) => item.is_done).length /
+                          checklists.length) *
+                          100,
+                      )}%`,
+                    }}
+                  />
+                </div>
+              )}
+
+              {loadingChecklists ? (
+                <div className="flex justify-center py-3">
+                  <Spinner label={t('app.loading')} size="sm" />
+                </div>
+              ) : checklists.length > 0 ? (
+                <ul className="mb-3 space-y-1.5">
+                  {checklists.map((item) => (
+                    <li
+                      key={item.public_id}
+                      className="flex items-center gap-2.5 rounded-lg border border-paper-300/80 bg-paper-50 px-2.5 py-2 dark:border-paper-400/40"
+                    >
+                      <button
+                        type="button"
+                        role="checkbox"
+                        aria-checked={item.is_done}
+                        disabled={pendingChecklistId === item.public_id}
+                        onClick={() => void handleToggleChecklist(item)}
+                        className={`flex size-4 shrink-0 items-center justify-center rounded border transition ${
+                          item.is_done
+                            ? 'border-petrol-600 bg-petrol-600 text-white'
+                            : 'border-paper-400 bg-paper-50 hover:border-petrol-500'
+                        }`}
+                      >
+                        {item.is_done && <Icon name="check" className="size-3" />}
+                      </button>
+                      <span
+                        className={`min-w-0 flex-1 text-sm wrap-break-words ${
+                          item.is_done ? 'text-ink-400 line-through' : 'text-ink-800'
+                        }`}
+                      >
+                        {item.title}
+                      </span>
+                      <IconButton
+                        icon="trash"
+                        label={t('detail.checklistDelete')}
+                        disabled={pendingChecklistId === item.public_id}
+                        onClick={() => void handleDeleteChecklist(item)}
+                        className="size-7 shrink-0 text-ink-400 hover:text-berry-600"
+                      />
+                    </li>
+                  ))}
+                </ul>
+              ) : (
+                <p className="mb-3 text-sm text-ink-400">{t('detail.noChecklists')}</p>
+              )}
+
+              <div className="flex gap-2">
+                <input
+                  type="text"
+                  value={checklistDraft}
+                  placeholder={t('detail.checklistPlaceholder')}
+                  disabled={addingChecklist}
+                  onChange={(event) => setChecklistDraft(event.target.value)}
+                  onKeyDown={(event) => {
+                    if (event.key === 'Enter') {
+                      event.preventDefault();
+                      void handleAddChecklist();
+                    }
+                  }}
+                  className="min-w-0 flex-1 rounded-lg border border-paper-300 bg-paper-50 px-3 py-1.5 text-base sm:text-sm text-ink-900 shadow-2xs transition placeholder:text-ink-400 hover:border-paper-400 focus:border-petrol-500 focus:ring-2 focus:ring-petrol-500/20 focus:outline-none dark:border-paper-400"
+                />
+                <Button
+                  size="sm"
+                  disabled={addingChecklist || checklistDraft.trim() === ''}
+                  onClick={() => void handleAddChecklist()}
+                >
+                  {t('detail.checklistAdd')}
+                </Button>
+              </div>
             </DetailSection>
 
             <DetailSection title={t('detail.comments')}>
@@ -497,6 +716,7 @@ export default function CardDetail({
 
       <AssigneePicker
         open={showAssigneePicker}
+        boardId={boardId}
         cardPublicId={card.public_id}
         selected={assignees}
         onClose={() => setShowAssigneePicker(false)}

@@ -4,7 +4,12 @@ import IconButton from '../atoms/IconButton';
 import Avatar from '../atoms/Avatar';
 import Spinner from '../atoms/Spinner';
 import { useT } from '../../i18n/LocaleContext';
-import { getComments, createComment, deleteComment } from '../../lib/api';
+import {
+  getComments,
+  createComment,
+  updateComment,
+  deleteComment,
+} from '../../lib/api';
 import { getSession } from '../../lib/session';
 import { describeError } from '../../lib/errors';
 import type { Comment } from '../../types/domain';
@@ -19,6 +24,9 @@ export default function CommentThread({ cardPublicId }: CommentThreadProps) {
   const [loading, setLoading] = useState(true);
   const [draft, setDraft] = useState('');
   const [sending, setSending] = useState(false);
+  const [editingId, setEditingId] = useState<string | null>(null);
+  const [editDraft, setEditDraft] = useState('');
+  const [savingEdit, setSavingEdit] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   const currentUserId = getSession()?.user.public_id ?? null;
@@ -74,6 +82,32 @@ export default function CommentThread({ cardPublicId }: CommentThreadProps) {
     }
   }
 
+  function startEdit(comment: Comment) {
+    setEditingId(comment.public_id);
+    setEditDraft(comment.message);
+    setError(null);
+  }
+
+  async function handleSaveEdit(comment: Comment) {
+    const trimmed = editDraft.trim();
+    if (trimmed === '') return;
+
+    setSavingEdit(true);
+    setError(null);
+    try {
+      const updated = await updateComment(cardPublicId, comment.public_id, trimmed);
+      setComments((current) =>
+        current.map((item) => (item.public_id === updated.public_id ? updated : item)),
+      );
+      setEditingId(null);
+      setEditDraft('');
+    } catch (caught: unknown) {
+      setError(describeError(caught, t));
+    } finally {
+      setSavingEdit(false);
+    }
+  }
+
   return (
     <div className="space-y-4">
       {loading ? (
@@ -106,17 +140,54 @@ export default function CommentThread({ cardPublicId }: CommentThreadProps) {
                     {comment.author.name}
                   </span>
                   {comment.author.public_id === currentUserId && (
-                    <IconButton
-                      icon="trash"
-                      label={t('detail.commentDelete')}
-                      onClick={() => void handleDelete(comment)}
-                      className="size-6 shrink-0 text-ink-400 hover:text-berry-600"
-                    />
+                    <div className="flex shrink-0 items-center gap-0.5">
+                      <IconButton
+                        icon="pencil"
+                        label={t('detail.commentEdit')}
+                        onClick={() => startEdit(comment)}
+                        className="size-6 text-ink-400 hover:text-ink-900"
+                      />
+                      <IconButton
+                        icon="trash"
+                        label={t('detail.commentDelete')}
+                        onClick={() => void handleDelete(comment)}
+                        className="size-6 text-ink-400 hover:text-berry-600"
+                      />
+                    </div>
                   )}
                 </div>
-                <p className="mt-1 text-xs sm:text-[13px] leading-relaxed wrap-break-words text-ink-800">
-                  {comment.message}
-                </p>
+                {editingId === comment.public_id ? (
+                  <div className="mt-2 space-y-2">
+                    <textarea
+                      rows={2}
+                      value={editDraft}
+                      disabled={savingEdit}
+                      onChange={(event) => setEditDraft(event.target.value)}
+                      className="w-full resize-none rounded-lg border border-paper-300 bg-paper-50 px-2.5 py-1.5 text-base sm:text-sm text-ink-900 focus:border-petrol-500 focus:ring-2 focus:ring-petrol-500/20 focus:outline-none dark:border-paper-400"
+                    />
+                    <div className="flex justify-end gap-1.5">
+                      <Button
+                        size="sm"
+                        variant="ghost"
+                        disabled={savingEdit}
+                        onClick={() => setEditingId(null)}
+                      >
+                        {t('common.cancel')}
+                      </Button>
+                      <Button
+                        size="sm"
+                        disabled={savingEdit || editDraft.trim() === ''}
+                        onClick={() => void handleSaveEdit(comment)}
+                      >
+                        {savingEdit ? t('common.saving') : t('common.save')}
+                      </Button>
+                    </div>
+                  </div>
+                ) : (
+                  <p className="mt-1 text-xs sm:text-[13px] leading-relaxed wrap-break-words text-ink-800">
+                    {comment.message}
+                  </p>
+                )}
               </div>
             </li>
           ))}

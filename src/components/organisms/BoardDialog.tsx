@@ -8,7 +8,15 @@ import Avatar from '../atoms/Avatar';
 import Spinner from '../atoms/Spinner';
 import { useT } from '../../i18n/LocaleContext';
 import { toApiDate, toInputDate } from '../../lib/date';
-import { createBoard, updateBoard, addBoardMembers, getUsers } from '../../lib/api';
+import {
+  createBoard,
+  updateBoard,
+  deleteBoard,
+  getBoardMembers,
+  addBoardMembers,
+  removeBoardMembers,
+  getUsers,
+} from '../../lib/api';
 import { describeError } from '../../lib/errors';
 import type { Board, User } from '../../types/domain';
 
@@ -17,6 +25,7 @@ interface BoardDialogProps {
   board: Board | null;
   onClose: () => void;
   onSaved: (board: Board) => void;
+  onDeleted?: (boardPublicId: string) => void;
 }
 
 export default function BoardDialog({
@@ -24,27 +33,51 @@ export default function BoardDialog({
   board,
   onClose,
   onSaved,
+  onDeleted,
 }: BoardDialogProps) {
   const t = useT();
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
   const [dueDate, setDueDate] = useState('');
+  const [existingMembers, setExistingMembers] = useState<User[]>([]);
+  const [loadingMembers, setLoadingMembers] = useState(false);
+  const [removingMemberId, setRemovingMemberId] = useState<string | null>(null);
   const [staged, setStaged] = useState<User[]>([]);
   const [query, setQuery] = useState('');
   const [results, setResults] = useState<User[]>([]);
   const [searching, setSearching] = useState(false);
   const [saving, setSaving] = useState(false);
+  const [deleting, setDeleting] = useState(false);
   const [error, setError] = useState<string | null>(null);
   useEffect(() => {
     if (!open) return;
     setTitle(board?.title ?? '');
     setDescription(board?.description ?? '');
     setDueDate(toInputDate(board?.due_date ?? null));
+    setExistingMembers([]);
     setStaged([]);
     setQuery('');
     setResults([]);
     setError(null);
-  }, [open, board]);
+
+    if (board === null) return;
+    let live = true;
+    setLoadingMembers(true);
+    getBoardMembers(board.public_id)
+      .then((members) => {
+        if (live) setExistingMembers(members);
+      })
+      .catch((caught: unknown) => {
+        if (live) setError(describeError(caught, t));
+      })
+      .finally(() => {
+        if (live) setLoadingMembers(false);
+      });
+
+    return () => {
+      live = false;
+    };
+  }, [open, board, t]);
   useEffect(() => {
     const term = query.trim();
     if (term.length < 2) {
@@ -86,6 +119,37 @@ export default function BoardDialog({
 
   function unstageMember(publicId: string) {
     setStaged((current) => current.filter((member) => member.public_id !== publicId));
+  }
+
+  async function handleRemoveExistingMember(publicId: string) {
+    if (board === null) return;
+    setRemovingMemberId(publicId);
+    setError(null);
+    try {
+      await removeBoardMembers(board.public_id, [publicId]);
+      setExistingMembers((current) =>
+        current.filter((member) => member.public_id !== publicId),
+      );
+    } catch (caught: unknown) {
+      setError(describeError(caught, t));
+    } finally {
+      setRemovingMemberId(null);
+    }
+  }
+
+  async function handleDelete() {
+    if (board === null || !window.confirm(t('board.deleteConfirm'))) return;
+    setDeleting(true);
+    setError(null);
+    try {
+      await deleteBoard(board.public_id);
+      onDeleted?.(board.public_id);
+      onClose();
+    } catch (caught: unknown) {
+      setError(describeError(caught, t));
+    } finally {
+      setDeleting(false);
+    }
   }
 
   async function handleSave() {
@@ -132,13 +196,23 @@ export default function BoardDialog({
     <Modal
       open={open}
       title={board === null ? t('board.new') : t('board.edit')}
-      onClose={saving ? () => undefined : onClose}
+      onClose={saving || deleting ? () => undefined : onClose}
       footer={
         <>
-          <Button variant="ghost" onClick={onClose} disabled={saving}>
+          {board !== null && (
+            <Button
+              variant="danger"
+              onClick={() => void handleDelete()}
+              disabled={saving || deleting}
+              className="mr-auto"
+            >
+              {deleting ? t('board.deleting') : t('board.delete')}
+            </Button>
+          )}
+          <Button variant="ghost" onClick={onClose} disabled={saving || deleting}>
             {t('common.cancel')}
           </Button>
-          <Button onClick={() => void handleSave()} disabled={saving}>
+          <Button onClick={() => void handleSave()} disabled={saving || deleting}>
             {saving ? t('common.saving') : t('common.save')}
           </Button>
         </>
@@ -190,8 +264,30 @@ export default function BoardDialog({
             {t('board.membersHint')}
           </p>
 
-          {staged.length > 0 && (
+          {loadingMembers ? (
+            <div className="mb-2 flex items-center gap-2 text-xs text-ink-400">
+              <Spinner label={t('app.loading')} size="sm" />
+            </div>
+          ) : (existingMembers.length > 0 || staged.length > 0) && (
             <ul className="mb-2 flex flex-wrap gap-1.5">
+              {existingMembers.map((member) => (
+                <li
+                  key={member.public_id}
+                  className="inline-flex items-center gap-1.5 rounded-full bg-paper-200 py-1 pr-1.5 pl-1 text-xs font-medium text-ink-800"
+                >
+                  <Avatar user={member} size="xs" />
+                  <span className="max-w-32 truncate">{member.name}</span>
+                  <button
+                    type="button"
+                    onClick={() => void handleRemoveExistingMember(member.public_id)}
+                    disabled={saving || deleting || removingMemberId === member.public_id}
+                    aria-label={t('board.removeMember', { name: member.name })}
+                    className="shrink-0 rounded-full p-0.5 text-ink-600 transition hover:bg-paper-300 disabled:pointer-events-none"
+                  >
+                    <Icon name="close" className="size-3" />
+                  </button>
+                </li>
+              ))}
               {staged.map((member) => (
                 <li
                   key={member.public_id}
@@ -202,7 +298,7 @@ export default function BoardDialog({
                   <button
                     type="button"
                     onClick={() => unstageMember(member.public_id)}
-                    disabled={saving}
+                    disabled={saving || deleting}
                     aria-label={t('board.removeMember', { name: member.name })}
                     className="shrink-0 rounded-full p-0.5 text-petrol-600 transition hover:bg-petrol-200 disabled:pointer-events-none"
                   >
@@ -236,9 +332,9 @@ export default function BoardDialog({
                 ) : (
                   <ul className="max-h-48 overflow-y-auto p-1 scrollbar-slim">
                     {results.map((user) => {
-                      const alreadyStaged = staged.some(
-                        (member) => member.public_id === user.public_id,
-                      );
+                      const alreadyStaged =
+                        staged.some((member) => member.public_id === user.public_id) ||
+                        existingMembers.some((member) => member.public_id === user.public_id);
                       return (
                         <li key={user.public_id}>
                           <button

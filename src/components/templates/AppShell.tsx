@@ -20,9 +20,11 @@ import { applyView, type BoardView } from '../../lib/view';
 import { describeError, isFatalError } from '../../lib/errors';
 import { navigate, type Route } from '../../lib/router';
 import {
+  ApiError,
   getMyBoards,
   getListsOnBoard,
   getCardsForBoard,
+  searchBoardCards,
   createCard,
   updateCard,
   deleteCard,
@@ -156,7 +158,8 @@ export default function AppShell({
         setCards([]);
         setLoadedBoardId(activeBoardId);
         const fatal = isFatalError(caught);
-        setLoadError(fatal ? errorMessage(caught) : null);
+        const forbidden = caught instanceof ApiError && caught.isForbidden;
+        setLoadError(fatal || forbidden ? errorMessage(caught) : null);
       } finally {
         if (!cancelled) setBoardLoading(false);
       }
@@ -200,9 +203,38 @@ export default function AppShell({
     [openCards, locale],
   );
 
+  const [remoteSearchIds, setRemoteSearchIds] = useState<Set<string> | null>(null);
+
+  useEffect(() => {
+    const trimmed = query.trim();
+    if (trimmed === '' || activeBoardId === '') {
+      setRemoteSearchIds(null);
+      return;
+    }
+
+    let live = true;
+    const timer = window.setTimeout(() => {
+      searchBoardCards(activeBoardId, { q: trimmed })
+        .then((matched) => {
+          if (live) setRemoteSearchIds(new Set(matched.map((c) => c.public_id)));
+        })
+        .catch(() => {
+          if (live) setRemoteSearchIds(null);
+        });
+    }, 250);
+
+    return () => {
+      live = false;
+      window.clearTimeout(timer);
+    };
+  }, [activeBoardId, query]);
+
   const searchedCards = useMemo(() => {
     const needle = query.trim().toLowerCase();
     if (needle.length === 0) return boardCards;
+    if (remoteSearchIds !== null) {
+      return boardCards.filter((card) => remoteSearchIds.has(card.public_id));
+    }
 
     return boardCards.filter(
       (card) =>
@@ -210,7 +242,7 @@ export default function AppShell({
         card.description.toLowerCase().includes(needle) ||
         card.labels.some((label) => label.name.toLowerCase().includes(needle)),
     );
-  }, [boardCards, query]);
+  }, [boardCards, query, remoteSearchIds]);
   const visibleCards = useMemo(() => {
     if (view === 'all') return searchedCards;
     const openIds = new Set(openCards.map((card) => card.public_id));
@@ -381,6 +413,19 @@ export default function AppShell({
         : [...current, saved],
     );
     if (!exists) openBoard(saved.public_id);
+  }
+
+  function handleBoardDeleted(boardPublicId: string) {
+    const remaining = boards.filter((board) => board.public_id !== boardPublicId);
+    setBoards(remaining);
+    if (activeBoardId === boardPublicId) {
+      const next = remaining[0];
+      if (next !== undefined) {
+        navigate({ name: 'board', boardId: next.public_id }, { replace: true });
+      } else {
+        navigate({ name: 'boards' }, { replace: true });
+      }
+    }
   }
   function handleCardUpdate(updated: Card) {
     setCards((current) =>
@@ -642,6 +687,7 @@ export default function AppShell({
       />
 
       <CardDetail
+        boardId={activeBoardId}
         card={openCardData}
         list={boardLists.find(
           (list) => list.public_id === openCardData?.list_public_id,
@@ -657,6 +703,7 @@ export default function AppShell({
         board={boardDialog === 'new' ? null : boardDialog}
         onClose={() => setBoardDialog(null)}
         onSaved={handleBoardSaved}
+        onDeleted={handleBoardDeleted}
       />
 
       <LabelManager

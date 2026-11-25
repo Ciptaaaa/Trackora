@@ -4,12 +4,13 @@ import Icon from '../atoms/Icon';
 import Avatar from '../atoms/Avatar';
 import Spinner from '../atoms/Spinner';
 import { useT } from '../../i18n/LocaleContext';
-import { getUsers, assignUser, unassignUser } from '../../lib/api';
+import { getBoardMembers, assignUser, unassignUser } from '../../lib/api';
 import { describeError } from '../../lib/errors';
 import type { User } from '../../types/domain';
 
 interface AssigneePickerProps {
   open: boolean;
+  boardId: string;
   cardPublicId: string;
   selected: User[];
   onClose: () => void;
@@ -18,6 +19,7 @@ interface AssigneePickerProps {
 
 export default function AssigneePicker({
   open,
+  boardId,
   cardPublicId,
   selected,
   onClose,
@@ -25,40 +27,45 @@ export default function AssigneePicker({
 }: AssigneePickerProps) {
   const t = useT();
   const [query, setQuery] = useState('');
-  const [results, setResults] = useState<User[]>([]);
+  const [members, setMembers] = useState<User[]>([]);
   const [loading, setLoading] = useState(false);
   const [pendingId, setPendingId] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    if (!open) {
+    if (!open || boardId === '') {
       setQuery('');
       return;
     }
 
     let live = true;
     setLoading(true);
-    const timer = window.setTimeout(
-      () => {
-        getUsers(query.trim())
-          .then((users) => {
-            if (live) setResults(users);
-          })
-          .catch((caught: unknown) => {
-            if (live) setError(describeError(caught, t));
-          })
-          .finally(() => {
-            if (live) setLoading(false);
-          });
-      },
-      query === '' ? 0 : 300,
-    );
+    setError(null);
+    getBoardMembers(boardId)
+      .then((users) => {
+        if (live) setMembers(users);
+      })
+      .catch((caught: unknown) => {
+        if (live) setError(describeError(caught, t));
+      })
+      .finally(() => {
+        if (live) setLoading(false);
+      });
 
     return () => {
       live = false;
-      window.clearTimeout(timer);
     };
-  }, [open, query, t]);
+  }, [open, boardId, t]);
+
+  const needle = query.trim().toLowerCase();
+  const results =
+    needle === ''
+      ? members
+      : members.filter(
+          (user) =>
+            user.name.toLowerCase().includes(needle) ||
+            user.email.toLowerCase().includes(needle),
+        );
 
   async function toggle(user: User) {
     const isOn = selected.some((item) => item.public_id === user.public_id);
