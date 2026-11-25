@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
+import { Toaster } from 'sonner';
 import AppShell from './AppShell';
 import AuthScreen from './AuthScreen';
 import { LocaleProvider } from '../../i18n/LocaleContext';
@@ -150,6 +151,12 @@ export default function TrackoraApp() {
           onLogout={handleLogout}
         />
       )}
+      <Toaster
+        theme={resolveTheme(theme)}
+        position="bottom-right"
+        richColors
+        closeButton
+      />
     </LocaleProvider>
   );
 }

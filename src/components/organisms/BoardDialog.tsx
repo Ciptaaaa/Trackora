@@ -1,5 +1,7 @@
 import { useEffect, useState } from 'react';
+import { toast } from 'sonner';
 import Modal from '../molecules/Modal';
+import ConfirmDialog from '../molecules/ConfirmDialog';
 import TextField from '../atoms/TextField';
 import TextArea from '../atoms/TextArea';
 import Button from '../atoms/Button';
@@ -48,6 +50,7 @@ export default function BoardDialog({
   const [searching, setSearching] = useState(false);
   const [saving, setSaving] = useState(false);
   const [deleting, setDeleting] = useState(false);
+  const [confirmDelete, setConfirmDelete] = useState(false);
   const [error, setError] = useState<string | null>(null);
   useEffect(() => {
     if (!open) return;
@@ -123,6 +126,7 @@ export default function BoardDialog({
 
   async function handleRemoveExistingMember(publicId: string) {
     if (board === null) return;
+    const targetMember = existingMembers.find((m) => m.public_id === publicId);
     setRemovingMemberId(publicId);
     setError(null);
     try {
@@ -130,6 +134,9 @@ export default function BoardDialog({
       setExistingMembers((current) =>
         current.filter((member) => member.public_id !== publicId),
       );
+      if (targetMember) {
+        toast.success(t('board.toastMemberRemoved', { name: targetMember.name }));
+      }
     } catch (caught: unknown) {
       setError(describeError(caught, t));
     } finally {
@@ -138,11 +145,13 @@ export default function BoardDialog({
   }
 
   async function handleDelete() {
-    if (board === null || !window.confirm(t('board.deleteConfirm'))) return;
+    if (board === null) return;
     setDeleting(true);
     setError(null);
     try {
       await deleteBoard(board.public_id);
+      setConfirmDelete(false);
+      toast.success(t('board.toastDeleted'));
       onDeleted?.(board.public_id);
       onClose();
     } catch (caught: unknown) {
@@ -182,6 +191,11 @@ export default function BoardDialog({
       }
 
       onSaved(saved);
+      toast.success(
+        board === null
+          ? t('board.toastCreated', { title: saved.title })
+          : t('board.toastUpdated'),
+      );
       onClose();
     } catch (caught: unknown) {
       setError(describeError(caught, t));
@@ -202,7 +216,7 @@ export default function BoardDialog({
           {board !== null && (
             <Button
               variant="danger"
-              onClick={() => void handleDelete()}
+              onClick={() => setConfirmDelete(true)}
               disabled={saving || deleting}
               className="mr-auto"
             >
@@ -375,6 +389,16 @@ export default function BoardDialog({
           </p>
         )}
       </div>
+
+      <ConfirmDialog
+        open={confirmDelete}
+        title={t('board.delete')}
+        message={t('board.deleteConfirm')}
+        confirmLabel={deleting ? t('board.deleting') : t('board.delete')}
+        busy={deleting}
+        onClose={() => setConfirmDelete(false)}
+        onConfirm={() => void handleDelete()}
+      />
     </Modal>
   );
 }

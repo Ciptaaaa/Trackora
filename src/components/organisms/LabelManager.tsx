@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import Modal from '../molecules/Modal';
+import ConfirmDialog from '../molecules/ConfirmDialog';
 import TextField from '../atoms/TextField';
 import Button from '../atoms/Button';
 import IconButton from '../atoms/IconButton';
@@ -42,6 +43,7 @@ export default function LabelManager({
   const [color, setColor] = useState<string>(PALETTE[0]);
   const [editingId, setEditingId] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
+  const [confirmDeleteLabel, setConfirmDeleteLabel] = useState<Label | null>(null);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
@@ -113,8 +115,6 @@ export default function LabelManager({
   }
 
   async function handleDelete(label: Label) {
-    if (!window.confirm(t('label.deleteConfirm'))) return;
-
     setBusy(true);
     setError(null);
 
@@ -124,6 +124,7 @@ export default function LabelManager({
         current.filter((item) => item.public_id !== label.public_id),
       );
       if (editingId === label.public_id) resetForm();
+      setConfirmDeleteLabel(null);
       onChanged();
     } catch (caught: unknown) {
       setError(describeError(caught, t));
@@ -178,7 +179,7 @@ export default function LabelManager({
                     icon="trash"
                     label={t('label.delete', { name: label.name })}
                     disabled={busy}
-                    onClick={() => void handleDelete(label)}
+                    onClick={() => setConfirmDeleteLabel(label)}
                     className="size-7 text-ink-400 hover:text-berry-600"
                   />
                 </li>
@@ -259,6 +260,21 @@ export default function LabelManager({
           </p>
         )}
       </div>
+
+      <ConfirmDialog
+        open={confirmDeleteLabel !== null}
+        title={
+          confirmDeleteLabel === null
+            ? ''
+            : t('label.delete', { name: confirmDeleteLabel.name })
+        }
+        message={t('label.deleteConfirm')}
+        busy={busy}
+        onClose={() => setConfirmDeleteLabel(null)}
+        onConfirm={() => {
+          if (confirmDeleteLabel !== null) void handleDelete(confirmDeleteLabel);
+        }}
+      />
     </Modal>
   );
 }

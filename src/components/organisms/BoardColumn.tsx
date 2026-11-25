@@ -3,6 +3,7 @@ import Icon from '../atoms/Icon';
 import IconButton from '../atoms/IconButton';
 import MenuPopover, { type MenuAction } from '../molecules/MenuPopover';
 import AddCardForm, { type NewCardDraft } from '../molecules/AddCardForm';
+import ConfirmDialog from '../molecules/ConfirmDialog';
 import TaskCard, { type Highlight } from './TaskCard';
 import { useT } from '../../i18n/LocaleContext';
 import { countOverdue, dueDay } from '../../lib/date';
@@ -48,6 +49,7 @@ export default function BoardColumn({
   const [over, setOver] = useState(false);
   const [adding, setAdding] = useState(false);
   const [renaming, setRenaming] = useState(false);
+  const [confirmDelete, setConfirmDelete] = useState(false);
   const [draft, setDraft] = useState(list.title);
   const renameRef = useRef<HTMLInputElement>(null);
   
@@ -115,9 +117,7 @@ export default function BoardColumn({
       label: t('list.delete'),
       icon: 'trash',
       tone: 'danger',
-      onSelect: () => {
-        if (window.confirm(t('list.deleteConfirm'))) onDeleteList(list.public_id);
-      },
+      onSelect: () => setConfirmDelete(true),
     },
   ];
 
@@ -232,6 +232,17 @@ export default function BoardColumn({
           onSubmit={(draft) => onAddCard(list.public_id, draft)}
         />
       </div>
+
+      <ConfirmDialog
+        open={confirmDelete}
+        title={t('list.delete')}
+        message={t('list.deleteConfirm')}
+        onClose={() => setConfirmDelete(false)}
+        onConfirm={() => {
+          setConfirmDelete(false);
+          onDeleteList(list.public_id);
+        }}
+      />
     </section>
   );
 }

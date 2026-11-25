@@ -5,11 +5,13 @@ import {
   type ChangeEvent,
   type SetStateAction,
 } from 'react';
+import { toast } from 'sonner';
 import Button from '../atoms/Button';
 import IconButton from '../atoms/IconButton';
 import TextField from '../atoms/TextField';
 import TextArea from '../atoms/TextArea';
 import DetailSection from '../molecules/DetailSection';
+import ConfirmDialog from '../molecules/ConfirmDialog';
 import DueBadge from '../molecules/DueBadge';
 import LabelChip from '../atoms/LabelChip';
 import Avatar from '../atoms/Avatar';
@@ -98,6 +100,7 @@ export default function CardDetail({
   const [saving, setSaving] = useState(false);
   const [showLabelPicker, setShowLabelPicker] = useState(false);
   const [showAssigneePicker, setShowAssigneePicker] = useState(false);
+  const [confirmDelete, setConfirmDelete] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const labelsRef = useRef<Label[]>([]);
   const assigneesRef = useRef<User[]>([]);
@@ -231,13 +234,17 @@ export default function CardDetail({
     const dotIndex = file.name.lastIndexOf('.');
     const ext = dotIndex === -1 ? '' : file.name.slice(dotIndex).toLowerCase();
     if (!ALLOWED_ATTACHMENT_EXTENSIONS.has(ext)) {
-      setError(t('detail.errFileType'));
+      const msg = t('detail.errFileType');
+      setError(msg);
+      toast.error(msg);
       event.target.value = '';
       return;
     }
 
     if (file.size > MAX_ATTACHMENT_BYTES) {
-      setError(t('detail.errFileTooLarge'));
+      const msg = t('detail.errFileTooLarge');
+      setError(msg);
+      toast.error(msg);
       event.target.value = '';
       return;
     }
@@ -692,10 +699,7 @@ export default function CardDetail({
                   size="sm"
                   variant="danger"
                   disabled={deleting}
-                  onClick={() => {
-                    if (window.confirm(t('detail.deleteConfirm')))
-                      onDelete(card.public_id);
-                  }}
+                  onClick={() => setConfirmDelete(true)}
                   className="ml-auto"
                 >
                   {deleting ? t('detail.deleting') : t('detail.delete')}
@@ -721,6 +725,19 @@ export default function CardDetail({
         selected={assignees}
         onClose={() => setShowAssigneePicker(false)}
         onChange={commitAssignees}
+      />
+
+      <ConfirmDialog
+        open={confirmDelete}
+        title={t('detail.delete')}
+        message={t('detail.deleteConfirm')}
+        confirmLabel={deleting ? t('detail.deleting') : t('detail.delete')}
+        busy={deleting}
+        onClose={() => setConfirmDelete(false)}
+        onConfirm={() => {
+          setConfirmDelete(false);
+          onDelete(card.public_id);
+        }}
       />
     </>
   );
