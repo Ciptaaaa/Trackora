@@ -1,6 +1,7 @@
 ---
 import WeekSpineStatic from './WeekSpineStatic.astro';
 import TypingHeadline from '../atoms/TypingHeadline.astro';
+import { ArrowRight } from 'lucide-react';
 import type { LandingCopy } from '../../i18n/landing';
 
 interface Props {
@@ -31,7 +32,7 @@ const secondaryCtaClass =
       text={copy.headline}
       speed={typingSpeed}
       hold={2600}
-      class="mt-6 text-[2.5rem] leading-[1.04] font-semibold tracking-[-0.045em] text-balance text-ink-900 sm:text-6xl lg:text-[4.4rem]"
+      class="mt-6 text-[2.25rem] leading-[1.08] font-bold tracking-[-0.035em] text-balance text-ink-900 sm:text-6xl lg:text-[4.2rem]"
     />
 
     <p
@@ -40,23 +41,12 @@ const secondaryCtaClass =
       {copy.lede}
     </p>
 
-    <div class="mt-8 flex flex-wrap items-center justify-center gap-3">
-      <a href="/boards" class={primaryCtaClass}>
+    <div class="mt-8 flex flex-col sm:flex-row flex-wrap items-center justify-center gap-3">
+      <a href="/boards" class:list={[primaryCtaClass, 'w-full sm:w-auto']}>
         {copy.primaryCta}
-        <svg
-          viewBox="0 0 16 16"
-          class="size-4"
-          fill="none"
-          stroke="currentColor"
-          stroke-width="1.75"
-          stroke-linecap="round"
-          stroke-linejoin="round"
-          aria-hidden="true"
-        >
-          <path d="M3 8h10M9 4l4 4-4 4" />
-        </svg>
+        <ArrowRight className="size-4 ml-1.5" aria-hidden="true" strokeWidth={2} />
       </a>
-      <a href="/register" class={secondaryCtaClass}>
+      <a href="/register" class:list={[secondaryCtaClass, 'w-full sm:w-auto']}>
         {copy.secondaryCta}
       </a>
     </div>

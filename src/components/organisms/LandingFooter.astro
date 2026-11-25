@@ -2,6 +2,7 @@
 import Logo from '../atoms/Logo.tsx';
 import LocaleLinks from '../molecules/LocaleLinks.astro';
 import { AnimatedThemeToggler } from '../ui/animated-theme-toggler';
+import { ArrowRight, Check } from 'lucide-react';
 import type { Locale } from '../../i18n';
 import type { LandingCopy } from '../../i18n/landing';
 
@@ -14,7 +15,7 @@ const { locale, copy } = Astro.props;
 const year = new Date().getFullYear();
 ---
 
-<footer id="mulai" class="scroll-mt-24 border-t border-paper-300 bg-petrol-50">
+<footer id="mulai" class="scroll-mt-24 border-t border-paper-300 bg-petrol-50/70 dark:bg-paper-100">
   <div class="mx-auto max-w-6xl px-5 py-16 sm:px-8 lg:py-24">
     <div class="grid gap-12 lg:grid-cols-[1.1fr_0.9fr] lg:items-center lg:gap-20">
       <div>
@@ -43,86 +44,60 @@ const year = new Date().getFullYear();
           </a>
         </div>
 
-        <p class="mt-8 max-w-lg border-t border-petrol-200 pt-5 text-xs leading-relaxed text-ink-600">
+        <p class="mt-8 max-w-lg border-t border-paper-300 pt-5 text-xs leading-relaxed text-ink-600">
           {copy.footerNote}
         </p>
       </div>
 
-      <a
-        href="/register"
-        class="group block rounded-2xl bg-paper-50 p-4 ring-1 ring-paper-300 transition-colors hover:ring-petrol-200 sm:p-5 dark:ring-paper-400"
+      <div
+        class="rounded-2xl border border-paper-300/80 bg-paper-50 p-6 shadow-sm sm:p-8 dark:border-paper-400/40"
       >
-        <div class="flex items-center justify-between gap-3">
-          <span class="text-xs font-medium text-ink-400">{copy.weekEyebrow}</span>
-          <span
-            class="rounded-full bg-mint-100 px-2 py-0.5 text-[11px] font-medium text-mint-600"
-          >
-            {copy.todayLabel}
-          </span>
+        <span class="inline-flex items-center gap-2 rounded-full bg-mint-100 px-3 py-1 text-xs font-semibold text-mint-600">
+          <span class="size-1.5 rounded-full bg-mint-600" aria-hidden="true" />
+          {copy.todayLabel}
+        </span>
+        <h3 class="mt-4 text-xl font-bold tracking-tight text-ink-900 sm:text-2xl">
+          {copy.footerCardTitle}
+        </h3>
+        <p class="mt-2 text-sm leading-relaxed text-ink-600">
+          {copy.ctaBody}
+        </p>
+
+        <div class="mt-6 flex flex-col gap-3">
+          <div class="flex items-center gap-2.5 text-xs font-medium text-ink-700">
+            <span class="flex size-5 items-center justify-center rounded-full bg-petrol-100 text-petrol-700 dark:bg-petrol-900/50 dark:text-paper-50">
+              <Check className="size-3" aria-hidden="true" strokeWidth={2.5} />
+            </span>
+            <span class="text-ink-800">{copy.views[0]?.title ?? 'Alur kerja visual'}</span>
+          </div>
+          <div class="flex items-center gap-2.5 text-xs font-medium text-ink-700">
+            <span class="flex size-5 items-center justify-center rounded-full bg-petrol-100 text-petrol-700 dark:bg-petrol-900/50 dark:text-paper-50">
+              <Check className="size-3" aria-hidden="true" strokeWidth={2.5} />
+            </span>
+            <span class="text-ink-800">{copy.views[1]?.title ?? 'Tenggat waktu terkelola'}</span>
+          </div>
+          <div class="flex items-center gap-2.5 text-xs font-medium text-ink-700">
+            <span class="flex size-5 items-center justify-center rounded-full bg-petrol-100 text-petrol-700 dark:bg-petrol-900/50 dark:text-paper-50">
+              <Check className="size-3" aria-hidden="true" strokeWidth={2.5} />
+            </span>
+            <span class="text-ink-800">{copy.views[2]?.title ?? 'Bebas distraksi & notifikasi'}</span>
+          </div>
         </div>
 
-        <div class="mt-4 grid grid-cols-7 gap-1">
-          {
-            copy.dayInitials.map((initial, index) => (
-              <div
-                class:list={[
-                  'flex flex-col items-center gap-1 rounded-md px-0.5 py-1',
-                  index === 2
-                    ? 'bg-petrol-50 text-petrol-700'
-                    : 'text-ink-400',
-                ]}
-              >
-                <span class="text-[9px] font-medium">{initial}</span>
-                <span class="text-[11px] font-semibold tabular-nums">
-                  {index + 1}
-                </span>
-                <span
-                  class:list={[
-                    'size-1 rounded-full',
-                    [1, 3, 5].includes(index) ? 'bg-petrol-600' : 'bg-transparent',
-                  ]}
-                />
-              </div>
-            ))
-          }
-        </div>
-
-        <div
-          class="mt-4 flex items-center gap-3 rounded-lg border border-paper-300 bg-paper-100 px-3 py-2.5 transition-colors group-hover:border-petrol-200 group-hover:bg-paper-50 dark:border-paper-400"
-        >
-          <span
-            class="flex size-5 shrink-0 items-center justify-center rounded border border-petrol-200 bg-petrol-50 text-petrol-700"
-            aria-hidden="true"
+        <div class="mt-8">
+          <a
+            href="/register"
+            class="inline-flex w-full items-center justify-center gap-2 rounded-lg bg-petrol-600 px-5 py-3 text-sm font-semibold text-white shadow-xs transition hover:bg-petrol-700 active:scale-[0.98]"
           >
-            <svg
-              viewBox="0 0 24 24"
-              class="size-3"
-              fill="none"
-              stroke="currentColor"
-              stroke-width="1.8"
-              stroke-linecap="round"
-              stroke-linejoin="round"
-            >
-              <path d="M7 3h7l4 4v14H7zM14 3v5h4" />
-            </svg>
-          </span>
-          <span class="min-w-0 flex-1">
-            <span class="block text-[13px] font-medium text-ink-800">
-              {copy.footerCardTitle}
-            </span>
-            <span class="mt-0.5 block text-[11px] text-ink-400">
-              {copy.todayLabel}
-            </span>
-          </span>
-          <span class="text-[11px] font-medium text-petrol-700">
-            {copy.navStart}
-          </span>
+            {copy.footerCta}
+            <ArrowRight className="size-4" aria-hidden="true" strokeWidth={2} />
+          </a>
         </div>
-      </a>
+      </div>
     </div>
 
     <div
-      class="mt-12 flex flex-col gap-5 border-t border-petrol-200 pt-6 sm:flex-row sm:items-center sm:justify-between"
+      class="mt-12 flex flex-col gap-5 border-t border-paper-300 pt-6 sm:flex-row sm:items-center sm:justify-between"
     >
       <Logo />
       <div class="flex flex-wrap items-center gap-2">
