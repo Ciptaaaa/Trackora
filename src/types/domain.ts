@@ -52,6 +52,14 @@ export interface Comment {
   };
 }
 
+export interface CardChecklist {
+  public_id: string;
+  title: string;
+  is_done: boolean;
+  position: number;
+  created_at: string;
+}
+
 export interface Card {
   public_id: string;
   list_public_id: string;
@@ -67,6 +75,7 @@ export interface RawCard {
   internal_id: number;
   public_id: string;
   list_internal_id: number;
+  list_public_id?: string;
   title: string;
   description: string;
   due_date: string | null;

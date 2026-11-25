@@ -5,6 +5,7 @@ import type {
   Attachment,
   Board,
   Card,
+  CardChecklist,
   Comment,
   Label,
   List,
@@ -27,11 +28,20 @@ export class ApiError extends Error {
     this.name = 'ApiError';
   }
   get isAuthError(): boolean {
-    return this.httpStatus === 401 || this.httpStatus === 403;
+    return this.httpStatus === 401;
+  }
+  get isForbidden(): boolean {
+    return this.httpStatus === 403;
   }
 }
 
-async function request<T>(path: string, init: RequestInit = {}): Promise<T> {
+let refreshPromise: Promise<boolean> | null = null;
+
+async function request<T>(
+  path: string,
+  init: RequestInit = {},
+  retried = false,
+): Promise<T> {
   const isMultipart = init.body instanceof FormData;
 
   let response: Response;
@@ -47,6 +57,31 @@ async function request<T>(path: string, init: RequestInit = {}): Promise<T> {
   } catch {
     throw new ApiError(0, 'network_error');
   }
+
+  if (
+    response.status === 401 &&
+    path !== '/v1/auth/login' &&
+    path !== '/v1/auth/refresh' &&
+    !retried
+  ) {
+    refreshPromise ??= refreshToken().finally(() => {
+      refreshPromise = null;
+    });
+    const refreshed = await refreshPromise;
+    if (refreshed) {
+      return request<T>(path, init, true);
+    }
+    clearSession();
+    labelCache = null;
+    if (
+      typeof window !== 'undefined' &&
+      window.location.pathname !== '/login' &&
+      window.location.pathname !== '/register'
+    ) {
+      window.location.assign('/login');
+    }
+  }
+
   const text = await response.text();
   const payload: Record<string, unknown> =
     text.length === 0 ? {} : (JSON.parse(text) as Record<string, unknown>);
@@ -245,6 +280,31 @@ export async function removeBoardMembers(
   await del(`${API_PREFIX}/boards/${boardPublicId}/members`, userPublicIds);
 }
 
+export async function getBoardDetail(boardPublicId: string): Promise<Board> {
+  const response = await get<Board>(`${API_PREFIX}/boards/${boardPublicId}`);
+  return adaptBoard(response.data);
+}
+
+export async function deleteBoard(boardPublicId: string): Promise<void> {
+  await del(`${API_PREFIX}/boards/${boardPublicId}`);
+}
+
+type RawBoardMember = User | { user: User };
+
+export async function getBoardMembers(boardPublicId: string): Promise<User[]> {
+  try {
+    const response = await get<RawBoardMember[] | null>(
+      `${API_PREFIX}/boards/${boardPublicId}/members`,
+    );
+    return (response.data ?? []).map((entry) =>
+      'user' in entry && entry.user ? entry.user : (entry as User),
+    );
+  } catch (caught: unknown) {
+    if (caught instanceof ApiError && caught.httpStatus === 404) return [];
+    throw caught;
+  }
+}
+
 
 function adaptList(raw: RawList, position: number): List {
   return {
@@ -327,6 +387,36 @@ export async function getCardsForBoard(lists: List[]): Promise<Card[]> {
     ),
   );
   return perList.flat();
+}
+
+export async function searchBoardCards(
+  boardPublicId: string,
+  params: {
+    q?: string;
+    label_id?: string;
+    assignee_id?: string;
+    due?: string;
+  },
+): Promise<Card[]> {
+  const search = new URLSearchParams();
+  if (params.q && params.q.trim() !== '') search.set('q', params.q.trim());
+  if (params.label_id && params.label_id !== '') search.set('label_id', params.label_id);
+  if (params.assignee_id && params.assignee_id !== '') {
+    search.set('assignee_id', params.assignee_id);
+  }
+  if (params.due && params.due !== '') search.set('due', params.due);
+
+  const query = search.toString();
+  const path = `${API_PREFIX}/boards/${boardPublicId}/cards${query === '' ? '' : `?${query}`}`;
+
+  const [response, labels] = await Promise.all([
+    get<RawCard[] | null>(path),
+    labelIndex(),
+  ]);
+
+  return (response.data ?? []).map((raw) =>
+    adaptCard(raw, raw.list_public_id ?? '', labels),
+  );
 }
 export async function getCardDetail(
   cardPublicId: string,
@@ -508,11 +598,69 @@ export async function createComment(
   return adaptComment(response.data);
 }
 
+export async function updateComment(
+  cardPublicId: string,
+  commentPublicId: string,
+  message: string,
+): Promise<Comment> {
+  const response = await put<RawComment>(
+    `${API_PREFIX}/cards/${cardPublicId}/comments/${commentPublicId}`,
+    { message },
+  );
+  return adaptComment(response.data);
+}
+
 export async function deleteComment(
   cardPublicId: string,
   commentPublicId: string,
 ): Promise<void> {
   await del(`${API_PREFIX}/cards/${cardPublicId}/comments/${commentPublicId}`);
+}
+
+export async function getChecklists(
+  cardPublicId: string,
+): Promise<CardChecklist[]> {
+  try {
+    const response = await get<CardChecklist[] | null>(
+      `${API_PREFIX}/cards/${cardPublicId}/checklists`,
+    );
+    return (response.data ?? []).sort((a, b) => a.position - b.position);
+  } catch (caught: unknown) {
+    if (caught instanceof ApiError && (caught.httpStatus === 0 || caught.isAuthError)) {
+      throw caught;
+    }
+    return [];
+  }
+}
+
+export async function createChecklist(
+  cardPublicId: string,
+  input: { title: string; position?: number },
+): Promise<CardChecklist> {
+  const response = await post<CardChecklist>(
+    `${API_PREFIX}/cards/${cardPublicId}/checklists`,
+    input,
+  );
+  return response.data;
+}
+
+export async function updateChecklist(
+  cardPublicId: string,
+  checklistPublicId: string,
+  input: { title?: string; is_done?: boolean; position?: number },
+): Promise<CardChecklist> {
+  const response = await put<CardChecklist>(
+    `${API_PREFIX}/cards/${cardPublicId}/checklists/${checklistPublicId}`,
+    input,
+  );
+  return response.data;
+}
+
+export async function deleteChecklist(
+  cardPublicId: string,
+  checklistPublicId: string,
+): Promise<void> {
+  await del(`${API_PREFIX}/cards/${cardPublicId}/checklists/${checklistPublicId}`);
 }
 
 

@@ -3,7 +3,9 @@ import type { Translate } from '../i18n';
 
 export function describeError(caught: unknown, t: Translate): string {
   if (caught instanceof ApiError) {
-    return caught.httpStatus === 0 ? t('board.errNetwork') : caught.message;
+    if (caught.httpStatus === 0) return t('board.errNetwork');
+    if (caught.httpStatus === 403) return t('board.errForbidden');
+    return caught.message;
   }
   return t('board.errLoad');
 }
