@@ -48,8 +48,7 @@ export const id = {
   'board.descriptionPlaceholder': 'Opsional',
   'board.due': 'Jatuh tempo',
   'board.members': 'Anggota',
-  'board.membersHint':
-    'Backend belum punya endpoint untuk membaca anggota, jadi daftar di bawah hanya berisi anggota yang kamu tambahkan sekarang.',
+  'board.membersHint': 'Tambahkan anggota untuk berkolaborasi di board ini.',
   'board.addMember': 'Tambah anggota',
   'board.removeMember': 'Keluarkan {name}',
   'board.searchUser': 'Cari nama atau email',
@@ -275,8 +274,7 @@ export const en: Dictionary = {
   'board.descriptionPlaceholder': 'Optional',
   'board.due': 'Due date',
   'board.members': 'Members',
-  'board.membersHint':
-    'The backend has no endpoint for reading members, so the list below only shows the ones you add right now.',
+  'board.membersHint': 'Add team members to collaborate on this board.',
   'board.addMember': 'Add member',
   'board.removeMember': 'Remove {name}',
   'board.searchUser': 'Search name or email',
@@ -498,7 +496,7 @@ export const zh: Dictionary = {
   'board.descriptionPlaceholder': '选填',
   'board.due': '到期日',
   'board.members': '成员',
-  'board.membersHint': '后端没有读取成员的接口，因此下面只显示你现在添加的成员。',
+  'board.membersHint': '添加协作成员以共同管理此看板。',
   'board.addMember': '添加成员',
   'board.removeMember': '移除 {name}',
   'board.searchUser': '搜索姓名或邮箱',
