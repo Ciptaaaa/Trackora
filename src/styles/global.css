@@ -10,49 +10,50 @@
 @theme {
   /* surfaces, light */
   --color-paper-50: #ffffff;
-  --color-paper-100: #f7f7f5;
-  --color-paper-200: #f1f1ef;
-  --color-paper-300: #e3e2df;
-  --color-paper-400: #c7c6c2;
+  --color-paper-100: #f1f2f4;
+  --color-paper-200: #ebecf0;
+  --color-paper-300: #dcdfe4;
+  --color-paper-400: #b3b9c4;
 
   /* text, light */
-  --color-ink-400: #6f6e69;
-  --color-ink-600: #5f5e5b;
-  --color-ink-800: #2f2e2a;
-  --color-ink-900: #191918;
+  --color-ink-400: #626f86;
+  --color-ink-600: #44546f;
+  --color-ink-800: #2c3e5d;
+  --color-ink-900: #172b4d;
 
   /* brand blue, primary action */
-  --color-petrol-50: #eaf4fd;
-  --color-petrol-200: #c7e3fa;
-  --color-petrol-400: #2f6fb0;
-  --color-petrol-600: #0075de;
-  --color-petrol-700: #005bab;
-  --color-petrol-900: #0a3a66;
+  --color-petrol-50: #e9f2ff;
+  --color-petrol-100: #d6e6ff;
+  --color-petrol-200: #cce0ff;
+  --color-petrol-400: #579dff;
+  --color-petrol-600: #0c66e4;
+  --color-petrol-700: #0055cc;
+  --color-petrol-900: #09326c;
 
   /* warning, due soon */
-  --color-saffron-100: #fff4e0;
-  --color-saffron-400: #f5a623;
-  --color-saffron-600: #8a5a00;
+  --color-saffron-100: #fff7d6;
+  --color-saffron-400: #f5cd47;
+  --color-saffron-600: #974f0c;
 
   /* danger, overdue / destructive */
-  --color-berry-100: #feeceb;
-  --color-berry-500: #d92d20;
-  --color-berry-700: #a61b12;
+  --color-berry-100: #ffedeb;
+  --color-berry-500: #e34935;
+  --color-berry-700: #ae2e24;
 
   /* mint, quiet success / hero badge */
-  --color-mint-100: #d7f5d6;
-  --color-mint-600: #1f7a3a;
+  --color-mint-100: #dcfff1;
+  --color-mint-600: #1f845a;
 
   /* Sidebar (always follows the page theme) + text on it. */
-  --color-nav-surface: #f7f7f5;
-  --color-nav-raised: #efefed;
-  --color-nav-text: #2f2e2a;
-  --color-nav-muted: #6f6e69;
-  --color-nav-border: #e3e2df;
+  --color-nav-surface: #ffffff;
+  --color-nav-raised: #f1f2f4;
+  --color-nav-text: #172b4d;
+  --color-nav-muted: #626f86;
+  --color-nav-border: #dcdfe4;
 
   --color-onaccent: #ffffff;
 
-  --color-scrim: rgb(15 15 15 / 0.42);
+  --color-scrim: rgb(9 30 66 / 0.54);
 
   --font-sans:
     'Inter Variable', 'Inter', 'Noto Sans SC', 'PingFang SC', 'Microsoft YaHei',
@@ -65,44 +66,45 @@
   contrast direction is preserved and nothing ends up light-on-light.
 */
 .dark {
-  --color-paper-50: #242424;
-  --color-paper-100: #191919;
-  --color-paper-200: #141414;
-  --color-paper-300: #383838;
-  --color-paper-400: #6e6e6e;
+  --color-paper-50: #1d2125;
+  --color-paper-100: #161a1d;
+  --color-paper-200: #22272b;
+  --color-paper-300: #2c333a;
+  --color-paper-400: #454f59;
 
-  --color-ink-400: #9b9a97;
-  --color-ink-600: #c7c6c2;
-  --color-ink-800: #e8e7e4;
-  --color-ink-900: #f7f7f5;
+  --color-ink-400: #8c9bab;
+  --color-ink-600: #b6c2cf;
+  --color-ink-800: #dee4ea;
+  --color-ink-900: #f7f8f9;
 
-  --color-petrol-50: #12283d;
-  --color-petrol-200: #1b3e5f;
-  --color-petrol-400: #7ab6f0;
-  --color-petrol-600: #4c9eea;
-  --color-petrol-700: #7ab6f0;
-  --color-petrol-900: #d6e9fb;
+  --color-petrol-50: #1c2b41;
+  --color-petrol-100: #223854;
+  --color-petrol-200: #28456c;
+  --color-petrol-400: #579dff;
+  --color-petrol-600: #579dff;
+  --color-petrol-700: #85b8ff;
+  --color-petrol-900: #cce0ff;
 
-  --color-saffron-100: #362a14;
-  --color-saffron-400: #f5b94d;
-  --color-saffron-600: #f5c97a;
+  --color-saffron-100: #332e1b;
+  --color-saffron-400: #f5cd47;
+  --color-saffron-600: #f8e6a0;
 
-  --color-berry-100: #3a1a17;
-  --color-berry-500: #f27a70;
-  --color-berry-700: #f5a39b;
+  --color-berry-100: #381e1c;
+  --color-berry-500: #f87168;
+  --color-berry-700: #fd9891;
 
-  --color-mint-100: #17301b;
-  --color-mint-600: #8fda9c;
+  --color-mint-100: #162e24;
+  --color-mint-600: #4bce97;
 
-  --color-nav-surface: #191919;
-  --color-nav-raised: #262626;
-  --color-nav-text: #f7f7f5;
-  --color-nav-muted: #9b9a97;
-  --color-nav-border: #2f2f2f;
+  --color-nav-surface: #1d2125;
+  --color-nav-raised: #282e33;
+  --color-nav-text: #f7f8f9;
+  --color-nav-muted: #8c9bab;
+  --color-nav-border: #2c333a;
 
-  --color-onaccent: #101820;
+  --color-onaccent: #161a1d;
 
-  --color-scrim: rgb(0 0 0 / 0.62);
+  --color-scrim: rgb(0 0 0 / 0.68);
 
   --background: oklch(0.147 0.004 49.3);
 
@@ -220,6 +222,22 @@
   }
   .scrollbar-slim::-webkit-scrollbar-track {
     background: transparent;
+  }
+
+  .trello-card {
+    box-shadow: 0 1px 1px rgba(9, 30, 66, 0.25), 0 0 1px rgba(9, 30, 66, 0.31);
+    transition: transform 120ms cubic-bezier(0.2, 0, 0, 1), box-shadow 120ms cubic-bezier(0.2, 0, 0, 1), border-color 120ms ease;
+  }
+  .trello-card:hover {
+    box-shadow: 0 3px 6px -1px rgba(9, 30, 66, 0.25), 0 0 1px rgba(9, 30, 66, 0.31);
+    transform: translateY(-1px);
+  }
+  .dark .trello-card {
+    box-shadow: 0 1px 1px rgba(3, 4, 4, 0.5), 0 0 1px rgba(3, 4, 4, 0.6);
+  }
+  .dark .trello-card:hover {
+    box-shadow: 0 4px 8px -1px rgba(3, 4, 4, 0.6), 0 0 1px rgba(3, 4, 4, 0.7);
+    transform: translateY(-1px);
   }
 }
 

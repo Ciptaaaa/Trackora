@@ -22,7 +22,7 @@ const {
     <meta name="robots" content="noindex" />
     <meta name="generator" content={Astro.generator} />
     <meta name="google-site-verification" content="nuRkMXFMe9W2MTwUlRI-NYn4y6XaVvu6sRYNvYCtZ5s" />
-    <meta name="theme-color" content="#f7f7f5" />
+    <meta name="theme-color" content="#f1f2f4" />
     <script is:inline>
       (() => {
         const meta = document.querySelector('meta[name="theme-color"]');
@@ -31,8 +31,8 @@ const {
           meta.setAttribute(
             'content',
             document.documentElement.classList.contains('dark')
-              ? '#191919'
-              : '#f7f7f5',
+              ? '#161a1d'
+              : '#f1f2f4',
           );
         };
         new MutationObserver(sync).observe(document.documentElement, {
@@ -68,7 +68,7 @@ const {
       })();
     </script>
   </head>
-  <body class="h-full bg-paper-200 antialiased">
+  <body class="h-full bg-paper-100 antialiased">
     <slot />
   </body>
 </html>

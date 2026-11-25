@@ -63,7 +63,7 @@ const structuredData = {
     <meta property="og:description" content={copy.metaDescription} />
     <meta property="og:url" content={canonical} />
     <meta property="og:locale" content={copy.ogLocale} />
-    <meta name="theme-color" content="#f7f7f5" />
+    <meta name="theme-color" content="#f1f2f4" />
     <script
       type="application/ld+json"
       is:inline
@@ -77,8 +77,8 @@ const structuredData = {
           meta.setAttribute(
             'content',
             document.documentElement.classList.contains('dark')
-              ? '#191919'
-              : '#f7f7f5',
+              ? '#161a1d'
+              : '#f1f2f4',
           );
         };
         new MutationObserver(sync).observe(document.documentElement, {
