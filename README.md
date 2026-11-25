@@ -19,12 +19,14 @@ Available in **Bahasa Indonesia** · **English** · **中文**
 
 ## Preview
 
+<p align="center">
+  <img src="docs/video/trackora.webp" width="96%" alt="Trackora interactive demo" />
+</p>
 
-
-  <p align="center">
-    <img src="docs/images/trackora-light.webp" width="48%" alt="Landing page, light theme" />
-    <img src="docs/images/trackora-dark.webp" width="48%" alt="Board view, dark theme" />
-  </p>
+<p align="center">
+  <img src="docs/images/trackora-light.webp" width="48%" alt="Landing page, light theme" />
+  <img src="docs/images/trackora-dark.webp" width="48%" alt="Board view, dark theme" />
+</p>
 
 The **week spine** is Trackora's signature element: seven days, each showing its workload as a stack of ticks that grows with the number of cards due. Click a day to highlight the cards due on it.
 
@@ -42,11 +44,12 @@ The same cards on the board. The due chip carries urgency: overdue, due soon, or
 
 ## Features
 
-- **Boards and columns.** Drag and drop cards between columns; rename, reorder, and delete columns inline.
+- **Boards, columns, and members.** Create, edit, and delete boards; invite or remove board members; drag and drop cards between columns; rename, reorder, and delete columns inline.
 - **Due dates that change color.** Neutral when far away, saffron when close, berry once overdue.
 - **Three views of one board.** Full workflow, due today only, or overdue only.
-- **Labels, assignees, comments, and attachments** live on the card where decisions are made.
-- **Search** across titles, descriptions, and labels. Press `/` to focus and `Esc` to clear.
+- **Card details & checklists.** Manage checklists with a live progress bar, labels, board-member assignees, editable comments, and validated file attachments (up to 10MB).
+- **Backend-synced search.** Filter cards across the active board, with `/` to focus and `Esc` to clear.
+- **Resilient auth & IDOR protection.** Automatic `401` token refresh with single-flight retry, plus explicit `403 Forbidden` access-denied handling.
 - **Account menu and settings.** Update the display name, switch theme and language, or sign out. The email address is shown read-only.
 - **Light and dark themes**, with no flash of white on load.
 - **Fully responsive.** Drawer and floating island on phones, an icon rail on tablets, and a full sidebar on desktop.
@@ -62,7 +65,8 @@ The same cards on the board. The due chip carries urgency: overdue, due soon, or
 | UI        | React 19 (islands, `client:load`)                                                          |
 | Language  | TypeScript strict, no `any`                                                                |
 | Styling   | Tailwind CSS 4 (`@tailwindcss/vite`)                                                       |
-| Fonts     | Noto Sans Variable · Playfair Display                                                      |
+| Icons     | `lucide-react`                                                                             |
+| Fonts     | Inter Variable · Noto Sans Variable · Playfair Display                                     |
 | i18n      | Custom, type-checked dictionaries (id, en, zh)                                             |
 | SEO       | `@astrojs/sitemap`, canonical + hreflang, JSON-LD                                          |
 | Backend   | Go · Fiber v3 · GORM · PostgreSQL ([repo](https://github.com/Ciptaaaa/Project-Management)) |
